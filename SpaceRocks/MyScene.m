@@ -61,11 +61,14 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         //add saucer
         SKSpriteNode *saucer = [SKSpriteNode spriteNodeWithImageNamed:@"saucer"];
         saucer.size = saucer.texture.size;
-        saucer.position = CGPointMake(360, 500);
+        saucer.position = CGPointMake(self.size.width, 500);
         saucer.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(200, 90)];
         saucer.physicsBody.dynamic = NO;
         [self addChild:saucer];
         
+        //add action to oscillate saucer
+        SKAction *saucerMove = [SKAction sequence:@[[SKAction moveToX:0 duration:2], [SKAction moveToX:self.size.width duration:2]]];
+        [saucer runAction:[SKAction repeatActionForever:saucerMove]];
     }
     return self;
 }
