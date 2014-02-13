@@ -27,6 +27,7 @@
 		69ADEF6818AD1C0A003881B1 /* fallingStars.sks in Resources */ = {isa = PBXBuildFile; fileRef = 69ADEF6618AD1C0A003881B1 /* fallingStars.sks */; };
 		69ADEF6918AD1C0A003881B1 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 69ADEF6718AD1C0A003881B1 /* spark.png */; };
 		69ADEF6D18AD2A8C003881B1 /* rock128.png in Resources */ = {isa = PBXBuildFile; fileRef = 69ADEF6C18AD2A8C003881B1 /* rock128.png */; };
+		69ADEF6F18AD7728003881B1 /* explosion.sks in Resources */ = {isa = PBXBuildFile; fileRef = 69ADEF6E18AD7728003881B1 /* explosion.sks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +67,7 @@
 		69ADEF6618AD1C0A003881B1 /* fallingStars.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = fallingStars.sks; sourceTree = "<group>"; };
 		69ADEF6718AD1C0A003881B1 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 		69ADEF6C18AD2A8C003881B1 /* rock128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = rock128.png; sourceTree = "<group>"; };
+		69ADEF6E18AD7728003881B1 /* explosion.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = explosion.sks; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,6 +136,7 @@
 				69ADEF3C18AD142B003881B1 /* ViewController.h */,
 				69ADEF3D18AD142B003881B1 /* ViewController.m */,
 				69ADEF3F18AD142B003881B1 /* MyScene.h */,
+				69ADEF6E18AD7728003881B1 /* explosion.sks */,
 				69ADEF4018AD142B003881B1 /* MyScene.m */,
 				69ADEF6618AD1C0A003881B1 /* fallingStars.sks */,
 				69ADEF6C18AD2A8C003881B1 /* rock128.png */,
@@ -254,6 +257,7 @@
 				69ADEF4518AD142B003881B1 /* Images.xcassets in Resources */,
 				69ADEF6D18AD2A8C003881B1 /* rock128.png in Resources */,
 				69ADEF4318AD142B003881B1 /* Spaceship.png in Resources */,
+				69ADEF6F18AD7728003881B1 /* explosion.sks in Resources */,
 				69ADEF6818AD1C0A003881B1 /* fallingStars.sks in Resources */,
 				69ADEF3B18AD142B003881B1 /* Main.storyboard in Resources */,
 			);

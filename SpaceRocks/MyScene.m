@@ -11,6 +11,10 @@
 @implementation MyScene
 
 
+static const uint32_t rockCategory     =  0x1 << 0;
+static const uint32_t shipCategory        =  0x1 << 1;
+
+
 static inline CGFloat skRandf() {
     return rand() / (CGFloat) RAND_MAX;
 }
@@ -29,13 +33,20 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     rock.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:rock.size];
     rock.physicsBody.angularVelocity = 5;
     rock.physicsBody.restitution = .5;
+    rock.physicsBody.contactTestBitMask=0;
     rock.physicsBody.usesPreciseCollisionDetection = YES;
+    rock.physicsBody.node.name = @"rock";
     [self addChild:rock];
 }
 
 -(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
         /* Setup your scene here */
+        
+        
+        
+        self.physicsWorld.gravity = CGVectorMake(0,-2);
+        self.physicsWorld.contactDelegate = self;
         
         SKAction *makeRocks = [SKAction sequence: @[
                                                     [SKAction performSelector:@selector(addRock) onTarget:self],
@@ -52,7 +63,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         NSString *myFile = [[NSBundle mainBundle] pathForResource:@"fallingStars" ofType:@"sks"];
         //extract emitter
         SKEmitterNode *myRocks = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
-        myRocks.position = CGPointMake(self.size.width/2, self.size.height);
+        myRocks.position = CGPointMake(self.size.width/2, self.size.height/2);
                //add emitter
         [self addChild:myRocks];
         
@@ -61,9 +72,11 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         saucer.position = CGPointMake(self.size.width, 500);
         saucer.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(200, 90)];
         saucer.physicsBody.affectedByGravity = NO;
-        saucer.physicsBody.angularDamping = .5;
-        saucer.physicsBody.linearDamping = 1;
-        saucer.physicsBody.density = 10;
+        saucer.physicsBody.angularDamping = 1;
+        saucer.physicsBody.linearDamping = .5;
+        saucer.physicsBody.density = 2;
+        saucer.physicsBody.contactTestBitMask=1;
+        saucer.physicsBody.node.name = @"saucer";
         [self addChild:saucer];
         
         //add action to oscillate saucer
@@ -107,6 +120,16 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         if (node.position.y < 0)
             [node removeFromParent];
     }];
+}
+
+-(void)didBeginContact:(SKPhysicsContact *)contact
+{
+    NSString *myFile = [[NSBundle mainBundle] pathForResource:@"explosion" ofType:@"sks"];
+    SKEmitterNode *boom = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
+    // NSLog(@"%@ hit %@",contact.bodyA.node.name, contact.bodyB.node.name);
+    boom.position = contact.contactPoint;
+    [self addChild:boom];
+    [contact.bodyB.node setHidden:YES];
 }
 
 @end
