@@ -3,12 +3,12 @@
     {
       "idiom" : "universal",
       "scale" : "1x",
-      "filename" : "rock64.png"
+      "filename" : "saucer.png"
     },
     {
       "idiom" : "universal",
       "scale" : "2x",
-      "filename" : "rock128-1.png"
+      "filename" : "saucer@2x.png"
     }
   ],
   "info" : {
