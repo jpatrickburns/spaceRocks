@@ -24,9 +24,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 {
     SKSpriteNode *rock = [SKSpriteNode spriteNodeWithImageNamed:@"rock"];
     rock.size = CGSizeMake(64, 64);
-    rock.position = CGPointMake(skRand(0, self.size.width), self.size.height-50);
+    rock.position = CGPointMake(skRand(0, self.size.width), self.size.height+50);
     rock.name = @"rock";
     rock.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:rock.size];
+    rock.physicsBody.angularVelocity = 5;
     rock.physicsBody.restitution = .5;
     rock.physicsBody.usesPreciseCollisionDetection = YES;
     [self addChild:rock];
@@ -48,26 +49,31 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         [self addChild:myBG];
         
         //make path to emitter file
-        NSString *myFile = [[NSBundle mainBundle] pathForResource:@"RockEmitter" ofType:@"sks"];
+        NSString *myFile = [[NSBundle mainBundle] pathForResource:@"fallingStars" ofType:@"sks"];
         //extract emitter
         SKEmitterNode *myRocks = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
         myRocks.position = CGPointMake(self.size.width/2, self.size.height);
-        SKEmitterNode *rocksFlipped= [myRocks copy];
-        rocksFlipped.xScale=-1;
-        //add emitter
+               //add emitter
         [self addChild:myRocks];
-        [self addChild:rocksFlipped];
         
         //add saucer
         SKSpriteNode *saucer = [SKSpriteNode spriteNodeWithImageNamed:@"saucer"];
-        saucer.size = saucer.texture.size;
         saucer.position = CGPointMake(self.size.width, 500);
         saucer.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(200, 90)];
-        saucer.physicsBody.dynamic = NO;
+        saucer.physicsBody.affectedByGravity = NO;
+        saucer.physicsBody.angularDamping = .5;
+        saucer.physicsBody.linearDamping = 1;
+        saucer.physicsBody.density = 10;
         [self addChild:saucer];
         
         //add action to oscillate saucer
-        SKAction *saucerMove = [SKAction sequence:@[[SKAction moveToX:0 duration:2], [SKAction moveToX:self.size.width duration:2]]];
+        SKAction *straighten = [SKAction rotateToAngle:0 duration:2];
+        SKAction *elevate = [SKAction moveToY:500 duration:2];
+        SKAction *bounce =[SKAction sequence:@[[SKAction moveToX:0 duration:2],
+                                               [SKAction moveToX:self.size.width duration:2],
+                                               ]];
+        SKAction *saucerMove = [SKAction group:@[straighten,elevate,bounce]];
+
         [saucer runAction:[SKAction repeatActionForever:saucerMove]];
     }
     return self;
@@ -93,6 +99,14 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
+}
+
+-(void)didSimulatePhysics
+{
+    [self enumerateChildNodesWithName:@"rock" usingBlock:^(SKNode *node, BOOL *stop) {
+        if (node.position.y < 0)
+            [node removeFromParent];
+    }];
 }
 
 @end
