@@ -24,6 +24,9 @@
 		69ADEF4E18AD142B003881B1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69ADEF2918AD142B003881B1 /* UIKit.framework */; };
 		69ADEF5618AD142B003881B1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 69ADEF5418AD142B003881B1 /* InfoPlist.strings */; };
 		69ADEF5818AD142B003881B1 /* SpaceRocksTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ADEF5718AD142B003881B1 /* SpaceRocksTests.m */; };
+		69ADEF6818AD1C0A003881B1 /* RockEmitter.sks in Resources */ = {isa = PBXBuildFile; fileRef = 69ADEF6618AD1C0A003881B1 /* RockEmitter.sks */; };
+		69ADEF6918AD1C0A003881B1 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 69ADEF6718AD1C0A003881B1 /* spark.png */; };
+		69ADEF6B18AD1C72003881B1 /* rock128.png in Resources */ = {isa = PBXBuildFile; fileRef = 69ADEF6A18AD1C72003881B1 /* rock128.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +63,9 @@
 		69ADEF5318AD142B003881B1 /* SpaceRocksTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SpaceRocksTests-Info.plist"; sourceTree = "<group>"; };
 		69ADEF5518AD142B003881B1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		69ADEF5718AD142B003881B1 /* SpaceRocksTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SpaceRocksTests.m; sourceTree = "<group>"; };
+		69ADEF6618AD1C0A003881B1 /* RockEmitter.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = RockEmitter.sks; sourceTree = "<group>"; };
+		69ADEF6718AD1C0A003881B1 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
+		69ADEF6A18AD1C72003881B1 /* rock128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = rock128.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +127,7 @@
 		69ADEF2D18AD142B003881B1 /* SpaceRocks */ = {
 			isa = PBXGroup;
 			children = (
+				69ADEF4418AD142B003881B1 /* Images.xcassets */,
 				69ADEF3618AD142B003881B1 /* AppDelegate.h */,
 				69ADEF3718AD142B003881B1 /* AppDelegate.m */,
 				69ADEF3918AD142B003881B1 /* Main.storyboard */,
@@ -128,8 +135,10 @@
 				69ADEF3D18AD142B003881B1 /* ViewController.m */,
 				69ADEF3F18AD142B003881B1 /* MyScene.h */,
 				69ADEF4018AD142B003881B1 /* MyScene.m */,
+				69ADEF6618AD1C0A003881B1 /* RockEmitter.sks */,
+				69ADEF6A18AD1C72003881B1 /* rock128.png */,
+				69ADEF6718AD1C0A003881B1 /* spark.png */,
 				69ADEF4218AD142B003881B1 /* Spaceship.png */,
-				69ADEF4418AD142B003881B1 /* Images.xcassets */,
 				69ADEF2E18AD142B003881B1 /* Supporting Files */,
 			);
 			path = SpaceRocks;
@@ -241,8 +250,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				69ADEF3218AD142B003881B1 /* InfoPlist.strings in Resources */,
+				69ADEF6918AD1C0A003881B1 /* spark.png in Resources */,
 				69ADEF4518AD142B003881B1 /* Images.xcassets in Resources */,
+				69ADEF6B18AD1C72003881B1 /* rock128.png in Resources */,
 				69ADEF4318AD142B003881B1 /* Spaceship.png in Resources */,
+				69ADEF6818AD1C0A003881B1 /* RockEmitter.sks in Resources */,
 				69ADEF3B18AD142B003881B1 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
