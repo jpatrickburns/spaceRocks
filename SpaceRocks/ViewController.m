@@ -11,12 +11,15 @@
 
 @implementation ViewController
 
+
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
     // Configure the view.
-    SKView * skView = (SKView *)self.view;
+    SKView *skView = (SKView *)self.view;
+    NSLog(@"Successfully created skView: %@",skView);
     skView.showsFPS = YES;
     skView.showsNodeCount = YES;
     

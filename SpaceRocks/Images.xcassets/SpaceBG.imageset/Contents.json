@@ -1,12 +1,22 @@
 {
   "images" : [
     {
-      "idiom" : "universal",
+      "idiom" : "iphone",
+      "scale" : "1x",
+      "filename" : "SpaceBG@.png"
+    },
+    {
+      "idiom" : "iphone",
+      "scale" : "2x",
+      "filename" : "SpaceBG@2x-1.png"
+    },
+    {
+      "idiom" : "ipad",
       "scale" : "1x",
       "filename" : "SpaceBG.png"
     },
     {
-      "idiom" : "universal",
+      "idiom" : "ipad",
       "scale" : "2x",
       "filename" : "SpaceBG@2x.png"
     }

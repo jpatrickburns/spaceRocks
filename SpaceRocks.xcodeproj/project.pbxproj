@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		693FF22518AEA8400065B9D5 /* Storyboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 693FF22418AEA8400065B9D5 /* Storyboard_iPhone.storyboard */; };
 		694A1A0118AE5C5700258956 /* FlyingSaucer.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 694A1A0018AE5C5700258956 /* FlyingSaucer.atlas */; };
 		694A1A0418AE6C6900258956 /* boing.caf in Resources */ = {isa = PBXBuildFile; fileRef = 694A1A0318AE69F600258956 /* boing.caf */; };
 		694A1A0618AE88AE00258956 /* boom.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 694A1A0518AE88AE00258956 /* boom.mp3 */; };
@@ -20,7 +21,6 @@
 		69ADEF3B18AD142B003881B1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 69ADEF3918AD142B003881B1 /* Main.storyboard */; };
 		69ADEF3E18AD142B003881B1 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ADEF3D18AD142B003881B1 /* ViewController.m */; };
 		69ADEF4118AD142B003881B1 /* MyScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ADEF4018AD142B003881B1 /* MyScene.m */; };
-		69ADEF4318AD142B003881B1 /* Spaceship.png in Resources */ = {isa = PBXBuildFile; fileRef = 69ADEF4218AD142B003881B1 /* Spaceship.png */; };
 		69ADEF4518AD142B003881B1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 69ADEF4418AD142B003881B1 /* Images.xcassets */; };
 		69ADEF4C18AD142B003881B1 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69ADEF4B18AD142B003881B1 /* XCTest.framework */; };
 		69ADEF4D18AD142B003881B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69ADEF2518AD142B003881B1 /* Foundation.framework */; };
@@ -44,6 +44,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		693FF22418AEA8400065B9D5 /* Storyboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard_iPhone.storyboard; sourceTree = "<group>"; };
 		694A1A0018AE5C5700258956 /* FlyingSaucer.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = FlyingSaucer.atlas; sourceTree = "<group>"; };
 		694A1A0318AE69F600258956 /* boing.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = boing.caf; sourceTree = "<group>"; };
 		694A1A0518AE88AE00258956 /* boom.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = boom.mp3; sourceTree = "<group>"; };
@@ -63,7 +64,6 @@
 		69ADEF3D18AD142B003881B1 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		69ADEF3F18AD142B003881B1 /* MyScene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyScene.h; sourceTree = "<group>"; };
 		69ADEF4018AD142B003881B1 /* MyScene.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyScene.m; sourceTree = "<group>"; };
-		69ADEF4218AD142B003881B1 /* Spaceship.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Spaceship.png; sourceTree = "<group>"; };
 		69ADEF4418AD142B003881B1 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		69ADEF4A18AD142B003881B1 /* SpaceRocksTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpaceRocksTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		69ADEF4B18AD142B003881B1 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -137,9 +137,10 @@
 			children = (
 				694A1A0018AE5C5700258956 /* FlyingSaucer.atlas */,
 				69ADEF4418AD142B003881B1 /* Images.xcassets */,
+				69ADEF3918AD142B003881B1 /* Main.storyboard */,
+				693FF22418AEA8400065B9D5 /* Storyboard_iPhone.storyboard */,
 				69ADEF3618AD142B003881B1 /* AppDelegate.h */,
 				69ADEF3718AD142B003881B1 /* AppDelegate.m */,
-				69ADEF3918AD142B003881B1 /* Main.storyboard */,
 				69ADEF3C18AD142B003881B1 /* ViewController.h */,
 				69ADEF3D18AD142B003881B1 /* ViewController.m */,
 				69ADEF3F18AD142B003881B1 /* MyScene.h */,
@@ -150,7 +151,6 @@
 				694A1A0318AE69F600258956 /* boing.caf */,
 				69ADEF6C18AD2A8C003881B1 /* rock128.png */,
 				69ADEF6718AD1C0A003881B1 /* spark.png */,
-				69ADEF4218AD142B003881B1 /* Spaceship.png */,
 				69ADEF2E18AD142B003881B1 /* Supporting Files */,
 			);
 			path = SpaceRocks;
@@ -266,11 +266,11 @@
 				69ADEF6918AD1C0A003881B1 /* spark.png in Resources */,
 				69ADEF4518AD142B003881B1 /* Images.xcassets in Resources */,
 				69ADEF6D18AD2A8C003881B1 /* rock128.png in Resources */,
-				69ADEF4318AD142B003881B1 /* Spaceship.png in Resources */,
 				694A1A0618AE88AE00258956 /* boom.mp3 in Resources */,
 				694A1A0118AE5C5700258956 /* FlyingSaucer.atlas in Resources */,
 				69ADEF6F18AD7728003881B1 /* explosion.sks in Resources */,
 				69ADEF6818AD1C0A003881B1 /* fallingStars.sks in Resources */,
+				693FF22518AEA8400065B9D5 /* Storyboard_iPhone.storyboard in Resources */,
 				69ADEF3B18AD142B003881B1 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -427,6 +427,7 @@
 				INFOPLIST_FILE = "SpaceRocks/SpaceRocks-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SPRITEKIT_TEXTURE_ATLAS_OUTPUT = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -441,6 +442,7 @@
 				INFOPLIST_FILE = "SpaceRocks/SpaceRocks-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SPRITEKIT_TEXTURE_ATLAS_OUTPUT = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
