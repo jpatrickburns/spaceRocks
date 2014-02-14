@@ -68,9 +68,18 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         [self addChild:myRocks];
         
         //add saucer
-        SKSpriteNode *saucer = [SKSpriteNode spriteNodeWithImageNamed:@"saucer"];
+        SKTextureAtlas *flyingSaucer = [SKTextureAtlas atlasNamed:@"FlyingSaucer"];
+        SKTexture *f1 = [flyingSaucer textureNamed:@"saucer001.png"];
+        SKTexture *f2 = [flyingSaucer textureNamed:@"saucer002.png"];
+        SKTexture *f3 = [flyingSaucer textureNamed:@"saucer003.png"];
+        SKTexture *f4 = [flyingSaucer textureNamed:@"saucer004.png"];
+        NSArray *saucerTextures = @[f1,f2,f3,f4];
+
+        SKAction *flyin = [SKAction animateWithTextures:saucerTextures timePerFrame:.1];
+        SKSpriteNode *saucer = [[SKSpriteNode alloc] initWithTexture:[flyingSaucer textureNamed:@"saucer001.png"]color:nil size:CGSizeMake(180, 90)];
+        [saucer runAction:flyin];
         saucer.position = CGPointMake(self.size.width, 500);
-        saucer.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(200, 90)];
+        saucer.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(180, 90)];
         saucer.physicsBody.affectedByGravity = NO;
         saucer.physicsBody.angularDamping = 1;
         saucer.physicsBody.linearDamping = .5;
