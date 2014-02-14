@@ -10,6 +10,8 @@
 
 @implementation MyScene
 
+SKSpriteNode *saucer;
+
 //masks for collisions
 static const uint32_t rockCategory     =  0x1 << 0;
 static const uint32_t shipCategory        =  0x1 << 1;
@@ -22,6 +24,8 @@ static inline CGFloat skRandf() {
 static inline CGFloat skRand(CGFloat low, CGFloat high) {
     return skRandf() * (high - low) + low;
 }
+
+
 
 - (void)addRock
 {
@@ -42,8 +46,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 -(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
         /* Setup your scene here */
+        self.playMySound = [SKAction playSoundFileNamed:@"boing.caf" waitForCompletion:NO];
         
-        self.physicsWorld.gravity = CGVectorMake(0,-2);
+        //self.physicsWorld.gravity = CGVectorMake(0,-2);
         self.physicsWorld.contactDelegate = self;
         
         SKAction *makeRocks = [SKAction sequence: @[
@@ -61,8 +66,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         //extract emitter
         SKEmitterNode *myStars = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
         myStars.position = CGPointMake(self.size.width/2, self.size.height/2);
-               //add emitter
-               [self addChild:myStars];
+        //add emitter
+        [self addChild:myStars];
         
         //add saucer
         SKTextureAtlas *flyingSaucer = [SKTextureAtlas atlasNamed:@"FlyingSaucer"];
@@ -78,43 +83,41 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         NSLog(@"Textures contain %@",saucerTextures);
         
         SKAction *flyin = [SKAction repeatActionForever:[SKAction animateWithTextures:saucerTextures timePerFrame:.2]];
-        SKSpriteNode *saucer = [[SKSpriteNode alloc] initWithTexture:[flyingSaucer textureNamed:@"saucer001.png"]
-                                                               color:nil
-                                                                size:CGSizeMake(180, 90)];
+        saucer = [[SKSpriteNode alloc] initWithTexture:[flyingSaucer textureNamed:@"saucer001.png"]
+                                                 color:nil
+                                                  size:CGSizeMake(180, 90)];
         [saucer runAction:flyin];
         
-        saucer.position = CGPointMake(self.size.width, 500);
+        saucer.position = CGPointMake(self.size.width, 600);
         //physics stuff
         saucer.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(180, 90)];
         saucer.physicsBody.affectedByGravity = NO;
-        saucer.physicsBody.angularDamping = .5;
+        saucer.physicsBody.angularDamping = 1;
+        saucer.physicsBody.restitution = 1;
         saucer.physicsBody.linearDamping = .5;
-        saucer.physicsBody.usesPreciseCollisionDetection = YES;
-
-        //saucer.physicsBody.density = 2;
+        //saucer.physicsBody.usesPreciseCollisionDetection = YES;
+        
+        saucer.physicsBody.density = 2;
         saucer.physicsBody.contactTestBitMask=1;
         saucer.physicsBody.node.name = @"saucer";
         [self addChild:saucer];
         
         //add action to oscillate saucer
-        SKAction *straighten = [SKAction rotateToAngle:0 duration:1];
-        SKAction *elevate = [SKAction moveToY:500 duration:2];
-        SKAction *bounce =[SKAction sequence:@[[SKAction moveToX:0 duration:2],
-                                               [SKAction moveToX:self.size.width duration:2],
+        SKAction *bounce =[SKAction sequence:@[[SKAction moveToX:0 duration:3],
+                                               [SKAction moveToX:self.size.width duration:3],
                                                ]];
-        SKAction *saucerMove = [SKAction group:@[straighten,elevate,straighten,bounce]];
-
-        [saucer runAction:[SKAction repeatActionForever:saucerMove]];
+        [bounce setTimingMode:SKActionTimingEaseInEaseOut];
+        [saucer runAction:[SKAction repeatActionForever:bounce]];
     }
     return self;
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     /* Called when a touch begins */
+//    
+//    for (UITouch *touch in touches) {
+//        CGPoint location = [touch locationInNode:self];
     
-    for (UITouch *touch in touches) {
-        CGPoint location = [touch locationInNode:self];
-        
 //        SKSpriteNode *sprite = [SKSpriteNode spriteNodeWithImageNamed:@"Spaceship"];
 //        
 //        sprite.position = location;
@@ -124,11 +127,25 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 //        [sprite runAction:[SKAction repeatActionForever:action]];
 //        
 //        [self addChild:sprite];
-    }
+//        }
 }
 
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
+    
+    //NSLog(@"Rotation is %f",saucer.zRotation);
+    SKAction *straighten = [SKAction rotateToAngle:0 duration:.5];
+    SKAction *elevate = [SKAction moveToY:600 duration:.75];
+    if (saucer.position.y<300) {
+        //NSLog(@"Saucer dropped too low!");
+        [saucer runAction:elevate];
+    }
+    float max = 15.0;
+    if (saucer.zRotation>(0.0174532925 * max)||saucer.zRotation<-max * 0.0174532925) {
+        [saucer runAction:straighten];
+
+    }
+
 }
 
 -(void)didSimulatePhysics
@@ -143,11 +160,16 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 {
     NSString *myFile = [[NSBundle mainBundle] pathForResource:@"explosion" ofType:@"sks"];
     SKEmitterNode *boom = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
-    // NSLog(@"%@ hit %@",contact.bodyA.node.name, contact.bodyB.node.name);
+    //NSLog(@"%@ hit %@",contact.bodyA.node.name, contact.bodyB.node.name);
     boom.position = contact.contactPoint;
     [self addChild:boom];
-    [self runAction:[SKAction playSoundFileNamed:@"boing.caf" waitForCompletion:NO]];
+    [self runAction:self.playMySound];
     [contact.bodyB.node removeFromParent];
+
+}
+
+-(void)didEndContact:(SKPhysicsContact *)contact
+{
 }
 
 @end
