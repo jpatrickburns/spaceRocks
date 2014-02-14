@@ -31,7 +31,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     rock.position = CGPointMake(skRand(0, self.size.width), self.size.height+50);
     rock.name = @"rock";
     rock.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:rock.size];
-    rock.physicsBody.angularVelocity = 5;
+    rock.physicsBody.angularVelocity = skRand(-20, 20);
     rock.physicsBody.restitution = .5;
     rock.physicsBody.contactTestBitMask=0;
     rock.physicsBody.usesPreciseCollisionDetection = YES;
@@ -43,8 +43,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     if (self = [super initWithSize:size]) {
         /* Setup your scene here */
         
-        
-        
         self.physicsWorld.gravity = CGVectorMake(0,-2);
         self.physicsWorld.contactDelegate = self;
         
@@ -53,7 +51,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
                                                     [SKAction waitForDuration:0.50 withRange:0.15]
                                                     ]];
         [self runAction: [SKAction repeatActionForever:makeRocks]];
-        
         
         SKSpriteNode *myBG = [SKSpriteNode spriteNodeWithImageNamed:@"SpaceBG"];
         myBG.position=CGPointMake(self.size.width/2, self.size.height/2);
@@ -118,15 +115,15 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     for (UITouch *touch in touches) {
         CGPoint location = [touch locationInNode:self];
         
-        SKSpriteNode *sprite = [SKSpriteNode spriteNodeWithImageNamed:@"Spaceship"];
-        
-        sprite.position = location;
-        
-        SKAction *action = [SKAction rotateByAngle:M_PI duration:1];
-        
-        [sprite runAction:[SKAction repeatActionForever:action]];
-        
-        [self addChild:sprite];
+//        SKSpriteNode *sprite = [SKSpriteNode spriteNodeWithImageNamed:@"Spaceship"];
+//        
+//        sprite.position = location;
+//        
+//        SKAction *action = [SKAction rotateByAngle:M_PI duration:1];
+//        
+//        [sprite runAction:[SKAction repeatActionForever:action]];
+//        
+//        [self addChild:sprite];
     }
 }
 
@@ -149,7 +146,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     // NSLog(@"%@ hit %@",contact.bodyA.node.name, contact.bodyB.node.name);
     boom.position = contact.contactPoint;
     [self addChild:boom];
-    [contact.bodyB.node setHidden:YES];
+    [self runAction:[SKAction playSoundFileNamed:@"boing.caf" waitForCompletion:NO]];
+    [contact.bodyB.node removeFromParent];
 }
 
 @end
