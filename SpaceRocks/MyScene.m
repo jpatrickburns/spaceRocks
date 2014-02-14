@@ -10,7 +10,7 @@
 
 @implementation MyScene
 
-
+//masks for collisions
 static const uint32_t rockCategory     =  0x1 << 0;
 static const uint32_t shipCategory        =  0x1 << 1;
 
@@ -23,11 +23,11 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     return skRandf() * (high - low) + low;
 }
 
-
 - (void)addRock
 {
     SKSpriteNode *rock = [SKSpriteNode spriteNodeWithImageNamed:@"rock"];
-    rock.size = CGSizeMake(64, 64);
+    CGFloat tempSize = skRand(5, 64);
+    rock.size = CGSizeMake(tempSize, tempSize);
     rock.position = CGPointMake(skRand(0, self.size.width), self.size.height+50);
     rock.name = @"rock";
     rock.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:rock.size];
@@ -62,39 +62,50 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         //make path to emitter file
         NSString *myFile = [[NSBundle mainBundle] pathForResource:@"fallingStars" ofType:@"sks"];
         //extract emitter
-        SKEmitterNode *myRocks = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
-        myRocks.position = CGPointMake(self.size.width/2, self.size.height/2);
+        SKEmitterNode *myStars = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
+        myStars.position = CGPointMake(self.size.width/2, self.size.height/2);
                //add emitter
-        [self addChild:myRocks];
+               [self addChild:myStars];
         
         //add saucer
         SKTextureAtlas *flyingSaucer = [SKTextureAtlas atlasNamed:@"FlyingSaucer"];
-        SKTexture *f1 = [flyingSaucer textureNamed:@"saucer001.png"];
-        SKTexture *f2 = [flyingSaucer textureNamed:@"saucer002.png"];
-        SKTexture *f3 = [flyingSaucer textureNamed:@"saucer003.png"];
-        SKTexture *f4 = [flyingSaucer textureNamed:@"saucer004.png"];
-        NSArray *saucerTextures = @[f1,f2,f3,f4];
-
-        SKAction *flyin = [SKAction animateWithTextures:saucerTextures timePerFrame:.1];
-        SKSpriteNode *saucer = [[SKSpriteNode alloc] initWithTexture:[flyingSaucer textureNamed:@"saucer001.png"]color:nil size:CGSizeMake(180, 90)];
+        NSArray *sortedList = [flyingSaucer.textureNames sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+        
+        NSMutableArray *saucerTextures = [[NSMutableArray alloc]init];
+        for (int i=0; i<sortedList.count; i++) {
+            SKTexture *newTex = [flyingSaucer textureNamed:sortedList[i]];
+            [saucerTextures addObject:newTex];
+            NSLog(@"Added %@",sortedList[i]);
+        }
+        
+        NSLog(@"Textures contain %@",saucerTextures);
+        
+        SKAction *flyin = [SKAction repeatActionForever:[SKAction animateWithTextures:saucerTextures timePerFrame:.2]];
+        SKSpriteNode *saucer = [[SKSpriteNode alloc] initWithTexture:[flyingSaucer textureNamed:@"saucer001.png"]
+                                                               color:nil
+                                                                size:CGSizeMake(180, 90)];
         [saucer runAction:flyin];
+        
         saucer.position = CGPointMake(self.size.width, 500);
+        //physics stuff
         saucer.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(180, 90)];
         saucer.physicsBody.affectedByGravity = NO;
-        saucer.physicsBody.angularDamping = 1;
+        saucer.physicsBody.angularDamping = .5;
         saucer.physicsBody.linearDamping = .5;
-        saucer.physicsBody.density = 2;
+        saucer.physicsBody.usesPreciseCollisionDetection = YES;
+
+        //saucer.physicsBody.density = 2;
         saucer.physicsBody.contactTestBitMask=1;
         saucer.physicsBody.node.name = @"saucer";
         [self addChild:saucer];
         
         //add action to oscillate saucer
-        SKAction *straighten = [SKAction rotateToAngle:0 duration:2];
+        SKAction *straighten = [SKAction rotateToAngle:0 duration:1];
         SKAction *elevate = [SKAction moveToY:500 duration:2];
         SKAction *bounce =[SKAction sequence:@[[SKAction moveToX:0 duration:2],
                                                [SKAction moveToX:self.size.width duration:2],
                                                ]];
-        SKAction *saucerMove = [SKAction group:@[straighten,elevate,bounce]];
+        SKAction *saucerMove = [SKAction group:@[straighten,elevate,straighten,bounce]];
 
         [saucer runAction:[SKAction repeatActionForever:saucerMove]];
     }
