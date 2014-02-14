@@ -46,9 +46,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 -(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
         /* Setup your scene here */
-        self.playMySound = [SKAction playSoundFileNamed:@"boing.caf" waitForCompletion:NO];
+        self.playMySound = [SKAction playSoundFileNamed:@"boom.mp3" waitForCompletion:NO];
         
-        //self.physicsWorld.gravity = CGVectorMake(0,-2);
+        self.physicsWorld.gravity = CGVectorMake(0,-2);
         self.physicsWorld.contactDelegate = self;
         
         SKAction *makeRocks = [SKAction sequence: @[
