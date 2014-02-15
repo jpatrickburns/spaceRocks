@@ -34,9 +34,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     rock.size = CGSizeMake(tempSize, tempSize);
     rock.position = CGPointMake(skRand(0, self.size.width), self.size.height);
     rock.name = @"rock";
-    rock.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:rock.size];
+    rock.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:rock.size.height];
     rock.physicsBody.angularVelocity = skRand(-20, 20);
-    rock.physicsBody.restitution = .5;
+    rock.physicsBody.restitution = 1;
     rock.physicsBody.contactTestBitMask=0;
     rock.physicsBody.usesPreciseCollisionDetection = YES;
     rock.physicsBody.node.name = @"rock";
@@ -82,7 +82,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         
         NSLog(@"Textures contain %@",saucerTextures);
         
-        SKAction *flyin = [SKAction repeatActionForever:[SKAction animateWithTextures:saucerTextures timePerFrame:.2]];
+        SKAction *flyin = [SKAction repeatActionForever:[SKAction animateWithTextures:saucerTextures timePerFrame:.1]];
         saucer = [[SKSpriteNode alloc] initWithTexture:[flyingSaucer textureNamed:@"saucer001.png"]
                                                  color:nil
                                                   size:CGSizeMake(self.size.width/5, self.size.width/10)];
@@ -93,7 +93,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         saucer.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:saucer.size];
         saucer.physicsBody.affectedByGravity = NO;
         saucer.physicsBody.angularDamping = 1;
-        saucer.physicsBody.restitution = 1;
+        //saucer.physicsBody.restitution = 0;
         saucer.physicsBody.linearDamping = .5;
         //saucer.physicsBody.usesPreciseCollisionDetection = YES;
         
@@ -136,11 +136,11 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     //NSLog(@"Rotation is %f",saucer.zRotation);
     SKAction *straighten = [SKAction rotateToAngle:0 duration:.5];
     SKAction *elevate = [SKAction moveToY:self.size.height*.55 duration:.75];
-    if (saucer.position.y<300) {
+    if (saucer.position.y<self.size.height/4) {
         //NSLog(@"Saucer dropped too low!");
         [saucer runAction:elevate];
     }
-    float max = 15.0;
+    float max = 22.0;
     if (saucer.zRotation>(0.0174532925 * max)||saucer.zRotation<-max * 0.0174532925) {
         [saucer runAction:straighten];
 
@@ -158,13 +158,13 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 
 -(void)didBeginContact:(SKPhysicsContact *)contact
 {
-    float factor = self.size.width/720;
+    float factor = self.size.width/360;
     NSString *myFile = [[NSBundle mainBundle] pathForResource:@"explosion" ofType:@"sks"];
     SKEmitterNode *boom = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
     //NSLog(@"%@ hit %@",contact.bodyA.node.name, contact.bodyB.node.name);
     boom.position = contact.contactPoint;
-    boom.particleScale= factor ;
-    boom.particleSize=CGSizeMake(64*factor, 64*factor);
+    boom.particleScale= factor/2;
+    boom.particleSize=CGSizeMake(64*factor/2, 64*factor/2);
     [self addChild:boom];
     [self runAction:self.playMySound];
     [contact.bodyB.node removeFromParent];

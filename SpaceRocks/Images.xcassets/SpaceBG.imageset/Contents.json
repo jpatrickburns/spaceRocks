@@ -11,6 +11,12 @@
       "filename" : "SpaceBG@2x-1.png"
     },
     {
+      "idiom" : "iphone",
+      "filename" : "SpaceBG_R4.png",
+      "subtype" : "retina4",
+      "scale" : "2x"
+    },
+    {
       "idiom" : "ipad",
       "scale" : "1x",
       "filename" : "SpaceBG.png"
