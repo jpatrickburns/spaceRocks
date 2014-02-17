@@ -45,6 +45,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 
 -(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
+        
         /* Setup your scene here */
         self.playMySound = [SKAction playSoundFileNamed:@"boom.mp3" waitForCompletion:NO];
         
@@ -57,9 +58,28 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
                                                     ]];
         [self runAction: [SKAction repeatActionForever:makeRocks]];
         
+        //add bg
+        
         SKSpriteNode *myBG = [SKSpriteNode spriteNodeWithImageNamed:@"SpaceBG"];
         myBG.position=CGPointMake(self.size.width/2, self.size.height/2);
         [self addChild:myBG];
+        
+        // add nebulae
+        SKSpriteNode *myNebulae = [SKSpriteNode spriteNodeWithImageNamed:@"SpaceNebulae"];
+        myNebulae.size = self.size;
+        CGPoint myTop = CGPointMake(self.size.width/2, self.size.height/2);
+        myNebulae.position=myTop;
+        [self addChild:myNebulae];
+        
+        //add a copy
+        
+        SKSpriteNode *myCopiedNebulae = [myNebulae copy];
+        myCopiedNebulae.position = CGPointMake(0,myNebulae.size.height);
+        [myNebulae addChild:myCopiedNebulae];
+        SKAction *moveNebulae = [SKAction sequence:@[
+                                                     [SKAction moveByX:0 y:-self.size.height duration:10],
+                                                     [SKAction moveTo:myTop duration:0]]];
+        [myNebulae runAction:[SKAction repeatActionForever:moveNebulae]];
         
         //make path to emitter file
         NSString *myFile = [[NSBundle mainBundle] pathForResource:@"fallingStars" ofType:@"sks"];
