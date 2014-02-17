@@ -14,7 +14,8 @@ SKSpriteNode *saucer;
 
 //masks for collisions
 static const uint32_t rockCategory     =  0x1 << 0;
-static const uint32_t shipCategory        =  0x1 << 1;
+static const uint32_t saucerCategory      =  0x1 << 1;
+static const uint32_t frameCategory      =  0x1 << 2;
 
 
 static inline CGFloat skRandf() {
@@ -38,6 +39,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     rock.physicsBody.angularVelocity = skRand(-20, 20);
     rock.physicsBody.restitution = 1;
     rock.physicsBody.contactTestBitMask=0;
+    rock.physicsBody.collisionBitMask=0;
     rock.physicsBody.usesPreciseCollisionDetection = YES;
     rock.physicsBody.node.name = @"rock";
     [self addChild:rock];
@@ -47,10 +49,13 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     if (self = [super initWithSize:size]) {
         
         /* Setup your scene here */
+        
         self.playMySound = [SKAction playSoundFileNamed:@"boom.mp3" waitForCompletion:NO];
         
         self.physicsWorld.gravity = CGVectorMake(0,-2);
         self.physicsWorld.contactDelegate = self;
+        
+        self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];
         
         SKAction *makeRocks = [SKAction sequence: @[
                                                     [SKAction performSelector:@selector(addRock) onTarget:self],
@@ -76,17 +81,22 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         SKSpriteNode *myCopiedNebulae = [myNebulae copy];
         myCopiedNebulae.position = CGPointMake(0,myNebulae.size.height);
         [myNebulae addChild:myCopiedNebulae];
+        
+        //make looping animation
         SKAction *moveNebulae = [SKAction sequence:@[
                                                      [SKAction moveByX:0 y:-self.size.height duration:10],
                                                      [SKAction moveTo:myTop duration:0]]];
         [myNebulae runAction:[SKAction repeatActionForever:moveNebulae]];
         
-        //make path to emitter file
+        //make path to star emitter file
         NSString *myFile = [[NSBundle mainBundle] pathForResource:@"fallingStars" ofType:@"sks"];
+        
         //extract emitter
         SKEmitterNode *myStars = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
-        myStars.position = CGPointMake(self.size.width/2, self.size.height/2);
-        //add emitter
+        myStars.particlePositionRange = CGVectorMake(self.size.width, self.size.height);
+        myStars.position = CGPointMake(self.size.width/2, self.size.height);
+        
+        //add stars emitter
         [self addChild:myStars];
         
         //add saucer
@@ -108,30 +118,45 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
                                                   size:CGSizeMake(saucerSize, saucerSize/2)];
         [saucer runAction:flyin];
         
-        saucer.position = CGPointMake(self.size.width, self.size.height*.55);
+        saucer.position = CGPointMake(self.size.width/2, self.size.height*.55);
         //physics stuff
         saucer.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:saucer.size];
         saucer.physicsBody.affectedByGravity = NO;
         saucer.physicsBody.angularDamping = 1;
-        //saucer.physicsBody.restitution = 0;
+        saucer.physicsBody.restitution = .5;
         saucer.physicsBody.linearDamping = .5;
         //saucer.physicsBody.usesPreciseCollisionDetection = YES;
         
-        saucer.physicsBody.density = 2;
+        //saucer.physicsBody.mass = 0.1;
         saucer.physicsBody.contactTestBitMask=1;
         saucer.physicsBody.node.name = @"saucer";
         [self addChild:saucer];
         
+        //init Accelerometer
+        self.myMotionManager = [[CMMotionManager alloc]init];
+        [self.myMotionManager startAccelerometerUpdates];
+
         //add action to oscillate saucer
         SKAction *bounce =[SKAction sequence:@[[SKAction moveToX:0 duration:3],
                                                [SKAction moveToX:self.size.width duration:3],
                                                ]];
         [bounce setTimingMode:SKActionTimingEaseInEaseOut];
-        [saucer runAction:[SKAction repeatActionForever:bounce]];
+//        [saucer runAction:[SKAction repeatActionForever:bounce]];
         
     }
     return self;
 }
+
+// method to interpret motion data
+
+-(void)processUserMotionForUpdate:(NSTimeInterval)currentTime {
+        CMAccelerometerData* data = self.myMotionManager.accelerometerData;
+    if (fabs(data.acceleration.x) > 0.2) {
+        [saucer.physicsBody applyForce:CGVectorMake(100.0 * data.acceleration.x, 0)];
+    }
+}
+
+
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     /* Called when a touch begins */
@@ -153,6 +178,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
+    
+    //implement tilt motion
+    [self processUserMotionForUpdate:currentTime];
     
     //NSLog(@"Rotation is %f",saucer.zRotation);
     SKAction *straighten = [SKAction rotateToAngle:0 duration:.75];
@@ -185,16 +213,19 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     }else{
         factor=1;
     }
-    NSString *myFile = [[NSBundle mainBundle] pathForResource:@"explosion" ofType:@"sks"];
-    SKEmitterNode *boom = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
-    //NSLog(@"%@ hit %@",contact.bodyA.node.name, contact.bodyB.node.name);
-    boom.position = contact.contactPoint;
-    boom.particleScale= factor/2;
-    boom.particleSize=CGSizeMake(64*factor, 64*factor);
-    [self addChild:boom];
-    [self runAction:self.playMySound];
-    [contact.bodyB.node removeFromParent];
+    
+    if ([contact.bodyB.node.name isEqual:@"rock"]) {
+        NSString *myFile = [[NSBundle mainBundle] pathForResource:@"explosion" ofType:@"sks"];
+        SKEmitterNode *boom = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
+        NSLog(@"%@ hit %@",contact.bodyA.node.name, contact.bodyB.node.name);
+        boom.position = contact.contactPoint;
+        boom.particleScale= factor/2;
+        boom.particleSize=CGSizeMake(64*factor, 64*factor);
+        [self addChild:boom];
+        [self runAction:self.playMySound];
+        [contact.bodyB.node removeFromParent];
 
+    }
 }
 
 -(void)didEndContact:(SKPhysicsContact *)contact
