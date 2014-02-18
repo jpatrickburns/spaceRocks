@@ -7,10 +7,21 @@
 //
 
 #import "MyScene.h"
+#import "ViewController.h"
+
+
+@interface MyScene()
+
+@property int score;
+
+
+@end
+
 
 @implementation MyScene
 
 SKSpriteNode *saucer;
+SKLabelNode *scoreLabel;
 
 //masks for collisions
 static const uint32_t rockCategory     =  0x1 << 0;
@@ -30,6 +41,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 
 - (void)addRock
 {
+    
     SKSpriteNode *rock = [SKSpriteNode spriteNodeWithImageNamed:@"rock"];
     CGFloat tempSize = skRand(5, self.size.width/20);
     rock.size = CGSizeMake(tempSize, tempSize);
@@ -57,6 +69,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         
         /* Setup your scene here */
         
+        self.score = 0;
+
+        
         self.playMySound = [SKAction playSoundFileNamed:@"boom.mp3" waitForCompletion:NO];
         
         self.physicsWorld.gravity = CGVectorMake(0,-2);
@@ -80,7 +95,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         SKSpriteNode *myNebulae = [SKSpriteNode spriteNodeWithImageNamed:@"SpaceNebulae"];
         myNebulae.size = self.size;
         CGPoint myTop = CGPointMake(self.size.width/2, self.size.height/2);
-        myNebulae.position=myTop;
+        myNebulae.position = myTop;
         [self addChild:myNebulae];
         
         //add a copy
@@ -143,10 +158,28 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         self.myMotionManager = [[CMMotionManager alloc]init];
         [self.myMotionManager startAccelerometerUpdates];
 
+        //make readout
+        [self setupHud];
         
     }
     return self;
 }
+
+
+-(void)setupHud {
+    SKSpriteNode *readOutBG = [[SKSpriteNode alloc]initWithColor:[SKColor colorWithHue:0.573 saturation:0.510 brightness:0.882 alpha:0.5] size:CGSizeMake(self.size.width, 30)];
+    readOutBG.position = CGPointMake(self.size.width/2, readOutBG.size.height/2);
+    readOutBG.zPosition = 5;
+    [self addChild:readOutBG];
+    scoreLabel = [SKLabelNode labelNodeWithFontNamed:@"Courier"];
+    //scoreLabel.name = kScoreHudName;
+    scoreLabel.fontSize = 15;
+    scoreLabel.fontColor = [SKColor whiteColor];
+    scoreLabel.text = [NSString stringWithFormat:@"Score: %04u", self.score];
+    scoreLabel.position = CGPointMake(-scoreLabel.frame.size.width, 0);
+    scoreLabel.name = @"score";
+    [readOutBG addChild:scoreLabel];
+    }
 
 // method to interpret motion data
 
@@ -196,9 +229,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     float max = 22.0;
     if (saucer.zRotation>(0.0174532925 * max)||saucer.zRotation<-max * 0.0174532925) {
         [saucer runAction:straighten];
-
     }
-
 }
 
 - (void)autoPilot{
@@ -218,6 +249,13 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     }];
 }
 
+- (void)adjustScore
+{
+    //NSLog(@"Called adjustScore. Score is:%i",self.score);
+    self.score++;
+    scoreLabel.text = [NSString stringWithFormat:@"Score: %04u", self.score];
+}
+
 -(void)didBeginContact:(SKPhysicsContact *)contact
 {
     float factor;
@@ -232,19 +270,20 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         SKEmitterNode *boom = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
         //NSLog(@"%@ hit %@",contact.bodyA.node.name, contact.bodyB.node.name);
         boom.position = contact.contactPoint;
-        boom.particleScale= factor/2;
-        boom.particleSize=CGSizeMake(64*factor, 64*factor);
+        boom.particleScale = factor/2;
+        boom.particleSize = CGSizeMake(64*factor, 64*factor);
         [self addChild:boom];
         [self runAction:self.playMySound];
         [contact.bodyB.node.children[0] removeFromParent];
         [contact.bodyB.node removeFromParent];
-        
+        [self adjustScore];
 
     }
 }
 
 -(void)didEndContact:(SKPhysicsContact *)contact
 {
+ 
 }
 
 @end
