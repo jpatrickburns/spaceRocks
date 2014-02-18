@@ -14,4 +14,5 @@
 @property (strong, nonatomic) SKAction *playMySound;
 @property (strong, nonatomic) CMMotionManager *myMotionManager;
 
+- (void)autoPilot;
 @end

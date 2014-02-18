@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6904339318B3BCB800668487 /* rockTrail.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6904339218B3BCB800668487 /* rockTrail.sks */; };
 		69208F0C18AFECD9005F2AD2 /* firey.png in Resources */ = {isa = PBXBuildFile; fileRef = 69208F0B18AFECD9005F2AD2 /* firey.png */; };
 		69208F0E18B001BE005F2AD2 /* byooo.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 69208F0D18B001BE005F2AD2 /* byooo.mp3 */; };
 		693FF22518AEA8400065B9D5 /* Storyboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 693FF22418AEA8400065B9D5 /* Storyboard_iPhone.storyboard */; };
@@ -46,6 +47,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6904339218B3BCB800668487 /* rockTrail.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = rockTrail.sks; sourceTree = "<group>"; };
 		69208F0B18AFECD9005F2AD2 /* firey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firey.png; sourceTree = "<group>"; };
 		69208F0D18B001BE005F2AD2 /* byooo.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = byooo.mp3; sourceTree = "<group>"; };
 		693FF22418AEA8400065B9D5 /* Storyboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard_iPhone.storyboard; sourceTree = "<group>"; };
@@ -149,6 +151,7 @@
 				69ADEF3D18AD142B003881B1 /* ViewController.m */,
 				69ADEF3F18AD142B003881B1 /* MyScene.h */,
 				69ADEF4018AD142B003881B1 /* MyScene.m */,
+				6904339218B3BCB800668487 /* rockTrail.sks */,
 				69ADEF6E18AD7728003881B1 /* explosion.sks */,
 				69ADEF6618AD1C0A003881B1 /* fallingStars.sks */,
 				69208F0D18B001BE005F2AD2 /* byooo.mp3 */,
@@ -272,6 +275,7 @@
 				69ADEF3218AD142B003881B1 /* InfoPlist.strings in Resources */,
 				69ADEF6918AD1C0A003881B1 /* spark.png in Resources */,
 				69208F0C18AFECD9005F2AD2 /* firey.png in Resources */,
+				6904339318B3BCB800668487 /* rockTrail.sks in Resources */,
 				69ADEF4518AD142B003881B1 /* Images.xcassets in Resources */,
 				69ADEF6D18AD2A8C003881B1 /* rock128.png in Resources */,
 				694A1A0618AE88AE00258956 /* boom.mp3 in Resources */,
