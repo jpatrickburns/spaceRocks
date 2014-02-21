@@ -13,7 +13,7 @@
 @interface MyScene()
 
 @property int score;
-
+@property int safeTime;
 
 @end
 
@@ -21,7 +21,11 @@
 @implementation MyScene
 
 SKSpriteNode *saucer;
+SKSpriteNode *autoPilotButton;
+SKSpriteNode *pauseButton;
 SKLabelNode *scoreLabel;
+SKLabelNode *safeTimeLabel;
+bool autoPilotIsOn;
 
 //masks for collisions
 static const uint32_t rockCategory     =  0x1 << 0;
@@ -68,10 +72,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     if (self = [super initWithSize:size]) {
         
         /* Setup your scene here */
-        
-        self.score = 0;
-
-        
+        autoPilotIsOn = NO;
         self.playMySound = [SKAction playSoundFileNamed:@"boom.mp3" waitForCompletion:NO];
         
         self.physicsWorld.gravity = CGVectorMake(0,-2);
@@ -157,7 +158,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         //init Accelerometer
         self.myMotionManager = [[CMMotionManager alloc]init];
         [self.myMotionManager startAccelerometerUpdates];
-
+        
         //make readout
         [self setupHud];
         
@@ -165,27 +166,56 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     return self;
 }
 
+- (void) pauseScene
+{
+    self.paused = !self.paused;
+}
 
 -(void)setupHud {
+    self.score = 0;
+    self.safeTime = 0;
     SKSpriteNode *readOutBG = [[SKSpriteNode alloc]initWithColor:[SKColor colorWithHue:0.573 saturation:0.510 brightness:0.882 alpha:0.5] size:CGSizeMake(self.size.width, 30)];
-    readOutBG.position = CGPointMake(self.size.width/2, readOutBG.size.height/2);
     readOutBG.zPosition = 5;
+    readOutBG.anchorPoint = CGPointMake(0, 0);
+    readOutBG.position = CGPointMake(0, 0);
     [self addChild:readOutBG];
+    
+    autoPilotButton = [[SKSpriteNode alloc]initWithImageNamed:@"apOff"];
+    autoPilotButton.anchorPoint = CGPointZero;
+    autoPilotButton.position = CGPointMake(5, 5);
+    autoPilotButton.name = @"autoPilot";
+    [readOutBG addChild:autoPilotButton];
+    
+    pauseButton = [[SKSpriteNode alloc]initWithImageNamed:@"pauseButton"];
+    pauseButton.anchorPoint = CGPointZero;
+    pauseButton.position = CGPointMake(autoPilotButton.size.width+10, 5);
+    pauseButton.name = @"pauseButton";
+    [readOutBG addChild:pauseButton];
+    
     scoreLabel = [SKLabelNode labelNodeWithFontNamed:@"Courier"];
     //scoreLabel.name = kScoreHudName;
     scoreLabel.fontSize = 15;
     scoreLabel.fontColor = [SKColor whiteColor];
-    scoreLabel.text = [NSString stringWithFormat:@"Score: %04u", self.score];
-    scoreLabel.position = CGPointMake(-scoreLabel.frame.size.width, 0);
+    scoreLabel.text = [NSString stringWithFormat:@"Score:%04u", self.score];
+    scoreLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
+    scoreLabel.position = CGPointMake(autoPilotButton.size.width+pauseButton.size.width + 20, readOutBG.size.height/3);
     scoreLabel.name = @"score";
     [readOutBG addChild:scoreLabel];
-    }
+    
+    safeTimeLabel = [scoreLabel copy];
+    //safeTimeLabel.text = [NSString stringWithFormat:@"%04f",_safeTime];
+    safeTimeLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeCenter;
+    safeTimeLabel.position = CGPointMake(self.size.width/2, readOutBG.size.height+5);
+    safeTimeLabel.alpha=.5;
+    [readOutBG addChild:safeTimeLabel];
+    
+}
 
 // method to interpret motion data
 
 -(void)processUserMotionForUpdate:(NSTimeInterval)currentTime {
     float forceFactor = 1000.0;
-        CMAccelerometerData* data = self.myMotionManager.accelerometerData;
+    CMAccelerometerData* data = self.myMotionManager.accelerometerData;
     if (fabs(data.acceleration.x) > 0.2||fabs(data.acceleration.y) > 0.2) {
         //this might be high! Might need to scale to device
         [saucer.physicsBody applyForce:CGVectorMake(forceFactor * data.acceleration.x, forceFactor * data.acceleration.y)];
@@ -196,28 +226,35 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     /* Called when a touch begins */
-//    
-//    for (UITouch *touch in touches) {
-//        CGPoint location = [touch locationInNode:self];
-    
-//        SKSpriteNode *sprite = [SKSpriteNode spriteNodeWithImageNamed:@"Spaceship"];
-//        
-//        sprite.position = location;
-//        
-//        SKAction *action = [SKAction rotateByAngle:M_PI duration:1];
-//        
-//        [sprite runAction:[SKAction repeatActionForever:action]];
-//        
-//        [self addChild:sprite];
-//        }
+    //
+    UITouch *touch = [touches anyObject];
+    CGPoint location = [touch locationInNode:self];
+    NSArray *nodes = [self nodesAtPoint:[touch locationInNode:self]];
+    for (SKNode *node in nodes) {
+        if ([node.name isEqual:@"autoPilot"]) {
+            [self autoPilot];
+        }
+        if ([node.name isEqualToString:@"pauseButton"]) {
+            [self pauseScene];
+        }
+    }
 }
 
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
-    
-    //implement tilt motion
-    [self processUserMotionForUpdate:currentTime];
-    
+    if (!self.isPaused) {
+        _safeTime++;
+        _score++;
+        safeTimeLabel.text = [NSString stringWithFormat:@"%04D",_safeTime ];
+        scoreLabel.text = [NSString stringWithFormat:@"Score: %04U",_score];
+        if (self.score > 0) {
+            scoreLabel.fontColor=[SKColor whiteColor];
+        }
+        if (!autoPilotIsOn) {
+            //implement tilt motion
+            [self processUserMotionForUpdate:currentTime];
+        }
+    }
     //NSLog(@"Rotation is %f",saucer.zRotation);
     SKAction *straighten = [SKAction rotateToAngle:0 duration:.75];
     SKAction *elevate = [SKAction moveToY:self.size.height*.55 duration:.75];
@@ -233,34 +270,52 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 }
 
 - (void)autoPilot{
-    //add action to oscillate saucer
-    SKAction *bounce =[SKAction sequence:@[[SKAction moveToX:0 duration:3],
-                                           [SKAction moveToX:self.size.width duration:3],
-                                           ]];
-    [bounce setTimingMode:SKActionTimingEaseInEaseOut];
-    [saucer runAction:[SKAction repeatActionForever:bounce] withKey:@"autoPilot"];
+    
+    autoPilotIsOn = !autoPilotIsOn;
+    
+    if (autoPilotIsOn) {
+        //add action to oscillate saucer
+        SKAction *bounce =[SKAction sequence:@[[SKAction moveToX:0 duration:3],
+                                               [SKAction moveToX:self.size.width duration:3],
+                                               ]];
+        [bounce setTimingMode:SKActionTimingEaseInEaseOut];
+        [saucer runAction:[SKAction repeatActionForever:bounce] withKey:@"autoPilot"];
+        autoPilotButton.texture = [SKTexture textureWithImageNamed:@"apOn"];
+        NSLog(@"Autopilot is on!");
+    }else{
+        [saucer removeActionForKey:@"autoPilot"];
+        autoPilotButton.texture = [SKTexture textureWithImageNamed:@"apOff"];
+        
+        NSLog(@"Autopilot is off!");
+    }
 }
 
 -(void)didSimulatePhysics
 {
     [self enumerateChildNodesWithName:@"rock" usingBlock:^(SKNode *node, BOOL *stop) {
         if (node.position.y < 0)
+            
+            //get rid of rock
             [node removeFromParent];
     }];
 }
 
 - (void)adjustScore
 {
-    //NSLog(@"Called adjustScore. Score is:%i",self.score);
-    self.score++;
-    scoreLabel.text = [NSString stringWithFormat:@"Score: %04u", self.score];
+    //subtract for rock hit
+    //self.score = self.score + _safeTime;
+    self.score = self.score -100;
+    if (self.score <0) {
+        scoreLabel.fontColor = [SKColor redColor];
+    }
+    _safeTime = 0;
 }
 
 -(void)didBeginContact:(SKPhysicsContact *)contact
 {
     float factor;
     if (self.size.width==360) {
-      factor=.5;
+        factor=.5;
     }else{
         factor=1;
     }
@@ -277,13 +332,13 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         [contact.bodyB.node.children[0] removeFromParent];
         [contact.bodyB.node removeFromParent];
         [self adjustScore];
-
+        
     }
 }
 
 -(void)didEndContact:(SKPhysicsContact *)contact
 {
- 
+    
 }
 
 @end
