@@ -13,7 +13,7 @@
 @interface MyScene()
 
 @property int score;
-@property int safeTime;
+@property int bonus;
 
 @end
 
@@ -23,8 +23,10 @@
 SKSpriteNode *saucer;
 SKSpriteNode *autoPilotButton;
 SKSpriteNode *pauseButton;
+//readouts
 SKLabelNode *scoreLabel;
-SKLabelNode *safeTimeLabel;
+SKLabelNode *bonusLabel;
+
 bool autoPilotIsOn;
 
 //masks for collisions
@@ -69,6 +71,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 }
 
 -(id)initWithSize:(CGSize)size {
+    
     if (self = [super initWithSize:size]) {
         
         /* Setup your scene here */
@@ -76,9 +79,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         
         self.physicsWorld.gravity = CGVectorMake(0,-2);
         self.physicsWorld.contactDelegate = self;
-        
         self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];
         
+        //start the rocks
         SKAction *makeRocks = [SKAction sequence: @[
                                                     [SKAction performSelector:@selector(addRock) onTarget:self],
                                                     [SKAction waitForDuration:0.50 withRange:0.15]
@@ -86,7 +89,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         [self runAction: [SKAction repeatActionForever:makeRocks]];
         
         //add bg
-        
         SKSpriteNode *myBG = [SKSpriteNode spriteNodeWithImageNamed:@"SpaceBG"];
         myBG.position=CGPointMake(self.size.width/2, self.size.height/2);
         [self addChild:myBG];
@@ -112,19 +114,17 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         
         //make path to star emitter file
         NSString *myFile = [[NSBundle mainBundle] pathForResource:@"fallingStars" ofType:@"sks"];
-        
         //extract emitter
         SKEmitterNode *myStars = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
         myStars.particlePositionRange = CGVectorMake(self.size.width, self.size.height);
         myStars.position = CGPointMake(self.size.width/2, self.size.height);
-        
         //add stars emitter
         [self addChild:myStars];
         
         //add saucer
         SKTextureAtlas *flyingSaucer = [SKTextureAtlas atlasNamed:@"FlyingSaucer"];
         NSArray *sortedList = [flyingSaucer.textureNames sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-        
+        //load textures
         NSMutableArray *saucerTextures = [[NSMutableArray alloc]init];
         for (int i=0; i<sortedList.count; i++) {
             SKTexture *newTex = [flyingSaucer textureNamed:sortedList[i]];
@@ -138,9 +138,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         saucer = [[SKSpriteNode alloc] initWithTexture:[flyingSaucer textureNamed:@"saucer001.png"]
                                                  color:nil
                                                   size:CGSizeMake(saucerSize, saucerSize/2)];
-        [saucer runAction:flyin];
         
         saucer.position = CGPointMake(self.size.width/2, self.size.height*.55);
+        [saucer runAction:flyin];
         
         //physics stuff
         saucer.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:saucer.size];
@@ -150,7 +150,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         saucer.physicsBody.restitution = .5;
         //saucer.physicsBody.usesPreciseCollisionDetection = YES;
         saucer.physicsBody.mass = 1;
-        saucer.physicsBody.contactTestBitMask=1;
+        saucer.physicsBody.contactTestBitMask = 1;
         saucer.physicsBody.node.name = @"saucer";
         [self addChild:saucer];
         
@@ -168,13 +168,18 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 - (void) pauseScene
 {
     self.paused = !self.paused;
+    if (self.paused) {
+        pauseButton.texture = [SKTexture textureWithImageNamed:@"playButton"];
+    }else{
+        pauseButton.texture = [SKTexture textureWithImageNamed:@"pauseButton"];
+    }
 }
 
 -(void)setupHud {
     self.score = 0;
-    self.safeTime = 0;
+    self.bonus = 0;
     autoPilotIsOn = NO;
-
+    
     SKSpriteNode *readOutBG = [[SKSpriteNode alloc]initWithColor:[SKColor colorWithHue:0.573 saturation:0.510 brightness:0.882 alpha:0.5] size:CGSizeMake(self.size.width, self.size.height/20)];
     readOutBG.zPosition = 5;
     readOutBG.anchorPoint = CGPointMake(0, 0);
@@ -203,12 +208,12 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     scoreLabel.name = @"score";
     [readOutBG addChild:scoreLabel];
     
-    safeTimeLabel = [scoreLabel copy];
+    bonusLabel = [scoreLabel copy];
     //safeTimeLabel.text = [NSString stringWithFormat:@"%04f",_safeTime];
-    safeTimeLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeCenter;
-    safeTimeLabel.position = CGPointMake(self.size.width/2, readOutBG.size.height+5);
-    safeTimeLabel.alpha=.5;
-    [readOutBG addChild:safeTimeLabel];
+    bonusLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
+    bonusLabel.position = CGPointMake(scoreLabel.position.x, readOutBG.size.height+5);
+    bonusLabel.alpha=.5;
+    [readOutBG addChild:bonusLabel];
 }
 
 // method to interpret motion data
@@ -216,9 +221,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 -(void)processUserMotionForUpdate:(NSTimeInterval)currentTime {
     float forceFactor = 1000.0;
     CMAccelerometerData* data = self.myMotionManager.accelerometerData;
-    if (fabs(data.acceleration.x) > 0.2||fabs(data.acceleration.y) > 0.2) {
-        //this might be high! Might need to scale to device
-        [saucer.physicsBody applyForce:CGVectorMake(forceFactor * data.acceleration.x, forceFactor * data.acceleration.y)];
+    if (fabs(data.acceleration.x) > 0.2||fabs(data.acceleration.y) > 0.5) {
+        [saucer.physicsBody applyForce:CGVectorMake(forceFactor * data.acceleration.x, forceFactor/2 * data.acceleration.y)];
     }
 }
 
@@ -240,12 +244,18 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     }
 }
 
+- (int)calcBonus{
+    int bonus = _bonus/30 * 50;
+    return bonus;
+}
+
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
     if (!self.isPaused) {
-        _safeTime++;
-        _score++;
-        safeTimeLabel.text = [NSString stringWithFormat:@"%04U",_safeTime ];
+        _bonus++;
+        //_score++;
+        
+        bonusLabel.text = [NSString stringWithFormat:@"Bonus: %04U",[self calcBonus]];
         scoreLabel.text = [NSString stringWithFormat:@"Score: %04D",_score];
         if (self.score > 0) {
             scoreLabel.fontColor=[SKColor whiteColor];
@@ -257,12 +267,16 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     }
     //NSLog(@"Rotation is %f",saucer.zRotation);
     SKAction *straighten = [SKAction rotateToAngle:0 duration:.75];
-    SKAction *elevate = [SKAction moveToY:self.size.height*.55 duration:.75];
-    [elevate setTimingMode:SKActionTimingEaseInEaseOut];
+    if (saucer.physicsBody.velocity.dy<0) {
+        [saucer.physicsBody applyForce:CGVectorMake(0, -200)];
+        NSLog(@"Compensating for movement %f",saucer.physicsBody.velocity.dy);
+    }
+    
     if (saucer.position.y<self.size.height*.55) {
         //NSLog(@"Saucer dropped too low!");
-        [saucer.physicsBody applyForce:CGVectorMake(0, 100)];
+        [saucer.physicsBody applyForce:CGVectorMake(0, 200)];
     }
+    
     float max = 22.0;
     if (saucer.zRotation>(0.0174532925 * max)||saucer.zRotation<-max * 0.0174532925) {
         [saucer runAction:straighten];
@@ -275,8 +289,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     
     if (autoPilotIsOn) {
         //add action to oscillate saucer
-        SKAction *bounce =[SKAction sequence:@[[SKAction moveToX:0 duration:3],
-                                               [SKAction moveToX:self.size.width duration:3],
+        SKAction *bounce =[SKAction sequence:@[[SKAction moveToX:0 + saucer.size.width/2 duration:3],
+                                               [SKAction moveToX:self.size.width - saucer.size.width/2 duration:3],
                                                ]];
         [bounce setTimingMode:SKActionTimingEaseInEaseOut];
         [saucer runAction:[SKAction repeatActionForever:bounce] withKey:@"autoPilot"];
@@ -304,11 +318,11 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 {
     //subtract for rock hit
     
-    self.score = self.score -100;
+    self.score = self.score - 200 + [self calcBonus];
     if (self.score <0) {
         scoreLabel.fontColor = [SKColor redColor];
     }
-    _safeTime = 0;
+    _bonus = 0;
 }
 
 -(void)didBeginContact:(SKPhysicsContact *)contact
@@ -334,9 +348,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         hitDamage.fontSize = 10;
         hitDamage.fontColor = [SKColor redColor];
         SKAction *scaleDissolve = [SKAction group:@[
-                                                    [SKAction scaleBy:2 duration:.5],
-                                                    [SKAction fadeAlphaTo:0 duration:.5]]];
-        hitDamage.text = @"-100";
+                                                    [SKAction scaleBy:2 duration:.75],
+                                                    [SKAction fadeAlphaTo:0 duration:.75]]];
+        hitDamage.text = @"-200";
         [self addChild:hitDamage];
         [hitDamage runAction:scaleDissolve completion:^(void){[hitDamage removeFromParent];}];
         

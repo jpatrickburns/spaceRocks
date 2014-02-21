@@ -12,9 +12,9 @@
 		69208F0E18B001BE005F2AD2 /* byooo.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 69208F0D18B001BE005F2AD2 /* byooo.mp3 */; };
 		693FF22518AEA8400065B9D5 /* Storyboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 693FF22418AEA8400065B9D5 /* Storyboard_iPhone.storyboard */; };
 		6943B65718B790EB00E3EF31 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6943B65618B790EB00E3EF31 /* Images.xcassets */; };
+		6943B65B18B7BE8500E3EF31 /* boom.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6943B65A18B7BE8500E3EF31 /* boom.mp3 */; };
 		694A1A0118AE5C5700258956 /* FlyingSaucer.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 694A1A0018AE5C5700258956 /* FlyingSaucer.atlas */; };
 		694A1A0418AE6C6900258956 /* boing.caf in Resources */ = {isa = PBXBuildFile; fileRef = 694A1A0318AE69F600258956 /* boing.caf */; };
-		694A1A0618AE88AE00258956 /* boom.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 694A1A0518AE88AE00258956 /* boom.mp3 */; };
 		69ADEF2618AD142B003881B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69ADEF2518AD142B003881B1 /* Foundation.framework */; };
 		69ADEF2818AD142B003881B1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69ADEF2718AD142B003881B1 /* CoreGraphics.framework */; };
 		69ADEF2A18AD142B003881B1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69ADEF2918AD142B003881B1 /* UIKit.framework */; };
@@ -52,9 +52,9 @@
 		69208F0D18B001BE005F2AD2 /* byooo.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = byooo.mp3; sourceTree = "<group>"; };
 		693FF22418AEA8400065B9D5 /* Storyboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard_iPhone.storyboard; sourceTree = "<group>"; };
 		6943B65618B790EB00E3EF31 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		6943B65A18B7BE8500E3EF31 /* boom.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = boom.mp3; sourceTree = "<group>"; };
 		694A1A0018AE5C5700258956 /* FlyingSaucer.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = FlyingSaucer.atlas; sourceTree = "<group>"; };
 		694A1A0318AE69F600258956 /* boing.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = boing.caf; sourceTree = "<group>"; };
-		694A1A0518AE88AE00258956 /* boom.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = boom.mp3; sourceTree = "<group>"; };
 		69ADEF2218AD142B003881B1 /* SpaceRocks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpaceRocks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		69ADEF2518AD142B003881B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		69ADEF2718AD142B003881B1 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -154,8 +154,8 @@
 				6904339218B3BCB800668487 /* rockTrail.sks */,
 				69ADEF6E18AD7728003881B1 /* explosion.sks */,
 				69ADEF6618AD1C0A003881B1 /* fallingStars.sks */,
+				6943B65A18B7BE8500E3EF31 /* boom.mp3 */,
 				69208F0D18B001BE005F2AD2 /* byooo.mp3 */,
-				694A1A0518AE88AE00258956 /* boom.mp3 */,
 				694A1A0318AE69F600258956 /* boing.caf */,
 				69208F0B18AFECD9005F2AD2 /* firey.png */,
 				69ADEF6C18AD2A8C003881B1 /* rock128.png */,
@@ -273,11 +273,11 @@
 				694A1A0418AE6C6900258956 /* boing.caf in Resources */,
 				69208F0E18B001BE005F2AD2 /* byooo.mp3 in Resources */,
 				69ADEF3218AD142B003881B1 /* InfoPlist.strings in Resources */,
+				6943B65B18B7BE8500E3EF31 /* boom.mp3 in Resources */,
 				69ADEF6918AD1C0A003881B1 /* spark.png in Resources */,
 				69208F0C18AFECD9005F2AD2 /* firey.png in Resources */,
 				6904339318B3BCB800668487 /* rockTrail.sks in Resources */,
 				69ADEF6D18AD2A8C003881B1 /* rock128.png in Resources */,
-				694A1A0618AE88AE00258956 /* boom.mp3 in Resources */,
 				694A1A0118AE5C5700258956 /* FlyingSaucer.atlas in Resources */,
 				6943B65718B790EB00E3EF31 /* Images.xcassets in Resources */,
 				69ADEF6F18AD7728003881B1 /* explosion.sks in Resources */,
