@@ -72,7 +72,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     if (self = [super initWithSize:size]) {
         
         /* Setup your scene here */
-        autoPilotIsOn = NO;
         self.playMySound = [SKAction playSoundFileNamed:@"boom.mp3" waitForCompletion:NO];
         
         self.physicsWorld.gravity = CGVectorMake(0,-2);
@@ -174,21 +173,23 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 -(void)setupHud {
     self.score = 0;
     self.safeTime = 0;
-    SKSpriteNode *readOutBG = [[SKSpriteNode alloc]initWithColor:[SKColor colorWithHue:0.573 saturation:0.510 brightness:0.882 alpha:0.5] size:CGSizeMake(self.size.width, 30)];
+    autoPilotIsOn = NO;
+
+    SKSpriteNode *readOutBG = [[SKSpriteNode alloc]initWithColor:[SKColor colorWithHue:0.573 saturation:0.510 brightness:0.882 alpha:0.5] size:CGSizeMake(self.size.width, self.size.height/20)];
     readOutBG.zPosition = 5;
     readOutBG.anchorPoint = CGPointMake(0, 0);
     readOutBG.position = CGPointMake(0, 0);
     [self addChild:readOutBG];
     
     autoPilotButton = [[SKSpriteNode alloc]initWithImageNamed:@"apOff"];
-    autoPilotButton.anchorPoint = CGPointZero;
-    autoPilotButton.position = CGPointMake(5, 5);
+    //autoPilotButton.anchorPoint = CGPointZero;
+    autoPilotButton.position = CGPointMake(autoPilotButton.size.width/2 +5, readOutBG.size.height/2);
     autoPilotButton.name = @"autoPilot";
     [readOutBG addChild:autoPilotButton];
     
     pauseButton = [[SKSpriteNode alloc]initWithImageNamed:@"pauseButton"];
-    pauseButton.anchorPoint = CGPointZero;
-    pauseButton.position = CGPointMake(autoPilotButton.size.width+10, 5);
+    //pauseButton.anchorPoint = CGPointZero;
+    pauseButton.position = CGPointMake(autoPilotButton.size.width + pauseButton.size.width, readOutBG.size.height/2);
     pauseButton.name = @"pauseButton";
     [readOutBG addChild:pauseButton];
     
@@ -208,7 +209,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     safeTimeLabel.position = CGPointMake(self.size.width/2, readOutBG.size.height+5);
     safeTimeLabel.alpha=.5;
     [readOutBG addChild:safeTimeLabel];
-    
 }
 
 // method to interpret motion data
@@ -245,8 +245,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     if (!self.isPaused) {
         _safeTime++;
         _score++;
-        safeTimeLabel.text = [NSString stringWithFormat:@"%04D",_safeTime ];
-        scoreLabel.text = [NSString stringWithFormat:@"Score: %04U",_score];
+        safeTimeLabel.text = [NSString stringWithFormat:@"%04U",_safeTime ];
+        scoreLabel.text = [NSString stringWithFormat:@"Score: %04D",_score];
         if (self.score > 0) {
             scoreLabel.fontColor=[SKColor whiteColor];
         }
@@ -303,7 +303,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 - (void)adjustScore
 {
     //subtract for rock hit
-    //self.score = self.score + _safeTime;
+    
     self.score = self.score -100;
     if (self.score <0) {
         scoreLabel.fontColor = [SKColor redColor];
@@ -329,6 +329,17 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         boom.particleSize = CGSizeMake(64*factor, 64*factor);
         [self addChild:boom];
         [self runAction:self.playMySound];
+        SKLabelNode *hitDamage = [[SKLabelNode alloc]initWithFontNamed:@"Courier"];
+        hitDamage.position = boom.position;
+        hitDamage.fontSize = 10;
+        hitDamage.fontColor = [SKColor redColor];
+        SKAction *scaleDissolve = [SKAction group:@[
+                                                    [SKAction scaleBy:2 duration:.5],
+                                                    [SKAction fadeAlphaTo:0 duration:.5]]];
+        hitDamage.text = @"-100";
+        [self addChild:hitDamage];
+        [hitDamage runAction:scaleDissolve completion:^(void){[hitDamage removeFromParent];}];
+        
         [contact.bodyB.node.children[0] removeFromParent];
         [contact.bodyB.node removeFromParent];
         [self adjustScore];
