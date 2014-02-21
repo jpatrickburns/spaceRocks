@@ -7,6 +7,7 @@
 //
 
 #import <SpriteKit/SpriteKit.h>
+#import <UIKit/UIKit.h>
 #import <CoreMotion/CoreMotion.h>
 
 @interface MyScene : SKScene <SKPhysicsContactDelegate>

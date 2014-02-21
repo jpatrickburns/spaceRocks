@@ -13,6 +13,7 @@
 		693FF22518AEA8400065B9D5 /* Storyboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 693FF22418AEA8400065B9D5 /* Storyboard_iPhone.storyboard */; };
 		6943B65718B790EB00E3EF31 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6943B65618B790EB00E3EF31 /* Images.xcassets */; };
 		6943B65B18B7BE8500E3EF31 /* boom.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6943B65A18B7BE8500E3EF31 /* boom.mp3 */; };
+		6943B66118B7D4E500E3EF31 /* GameOver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6943B66018B7D4E500E3EF31 /* GameOver.m */; };
 		694A1A0118AE5C5700258956 /* FlyingSaucer.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 694A1A0018AE5C5700258956 /* FlyingSaucer.atlas */; };
 		694A1A0418AE6C6900258956 /* boing.caf in Resources */ = {isa = PBXBuildFile; fileRef = 694A1A0318AE69F600258956 /* boing.caf */; };
 		69ADEF2618AD142B003881B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69ADEF2518AD142B003881B1 /* Foundation.framework */; };
@@ -53,6 +54,8 @@
 		693FF22418AEA8400065B9D5 /* Storyboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard_iPhone.storyboard; sourceTree = "<group>"; };
 		6943B65618B790EB00E3EF31 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		6943B65A18B7BE8500E3EF31 /* boom.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = boom.mp3; sourceTree = "<group>"; };
+		6943B65F18B7D4E500E3EF31 /* GameOver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameOver.h; path = ../GameOver.h; sourceTree = "<group>"; };
+		6943B66018B7D4E500E3EF31 /* GameOver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GameOver.m; path = ../GameOver.m; sourceTree = "<group>"; };
 		694A1A0018AE5C5700258956 /* FlyingSaucer.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = FlyingSaucer.atlas; sourceTree = "<group>"; };
 		694A1A0318AE69F600258956 /* boing.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = boing.caf; sourceTree = "<group>"; };
 		69ADEF2218AD142B003881B1 /* SpaceRocks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpaceRocks.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -151,6 +154,8 @@
 				69ADEF3D18AD142B003881B1 /* ViewController.m */,
 				69ADEF3F18AD142B003881B1 /* MyScene.h */,
 				69ADEF4018AD142B003881B1 /* MyScene.m */,
+				6943B65F18B7D4E500E3EF31 /* GameOver.h */,
+				6943B66018B7D4E500E3EF31 /* GameOver.m */,
 				6904339218B3BCB800668487 /* rockTrail.sks */,
 				69ADEF6E18AD7728003881B1 /* explosion.sks */,
 				69ADEF6618AD1C0A003881B1 /* fallingStars.sks */,
@@ -303,6 +308,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				69ADEF4118AD142B003881B1 /* MyScene.m in Sources */,
+				6943B66118B7D4E500E3EF31 /* GameOver.m in Sources */,
 				69ADEF3E18AD142B003881B1 /* ViewController.m in Sources */,
 				69ADEF3818AD142B003881B1 /* AppDelegate.m in Sources */,
 				69ADEF3418AD142B003881B1 /* main.m in Sources */,

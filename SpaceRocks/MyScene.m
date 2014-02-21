@@ -8,13 +8,13 @@
 
 #import "MyScene.h"
 #import "ViewController.h"
-
+#import "GameOver.h"
 
 @interface MyScene()
 
 @property int score;
 @property int bonus;
-
+@property float damage;
 @end
 
 
@@ -26,6 +26,7 @@ SKSpriteNode *pauseButton;
 //readouts
 SKLabelNode *scoreLabel;
 SKLabelNode *bonusLabel;
+UIProgressView *damageIndicator;
 
 bool autoPilotIsOn;
 
@@ -178,6 +179,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 -(void)setupHud {
     self.score = 0;
     self.bonus = 0;
+    self.damage = 1000;
     autoPilotIsOn = NO;
     
     SKSpriteNode *readOutBG = [[SKSpriteNode alloc]initWithColor:[SKColor colorWithHue:0.573 saturation:0.510 brightness:0.882 alpha:0.5] size:CGSizeMake(self.size.width, self.size.height/20)];
@@ -214,7 +216,20 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     bonusLabel.position = CGPointMake(scoreLabel.position.x, readOutBG.size.height+5);
     bonusLabel.alpha=.5;
     [readOutBG addChild:bonusLabel];
-}
+    }
+
+
+- (void)didMoveToView:(SKView *)view
+{
+    [super didMoveToView:view];
+    damageIndicator = [[UIProgressView alloc]initWithFrame:CGRectMake(50, 20, self.size.width-100, 20)];
+    damageIndicator.progressViewStyle = UIProgressViewStyleBar;
+    damageIndicator.alpha = .5;
+    damageIndicator.progress = 1;
+    damageIndicator.trackTintColor = [SKColor redColor];
+    [self.view addSubview:damageIndicator];
+    
+     }
 
 // method to interpret motion data
 
@@ -222,7 +237,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     float forceFactor = 1000.0;
     CMAccelerometerData* data = self.myMotionManager.accelerometerData;
     if (fabs(data.acceleration.x) > 0.2||fabs(data.acceleration.y) > 0.5) {
-        [saucer.physicsBody applyForce:CGVectorMake(forceFactor * data.acceleration.x, forceFactor/2 * data.acceleration.y)];
+        [saucer.physicsBody applyForce:CGVectorMake(forceFactor * data.acceleration.x, forceFactor * data.acceleration.y)];
     }
 }
 
@@ -265,12 +280,11 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
             [self processUserMotionForUpdate:currentTime];
         }
     }
+    
+    
+    
     //NSLog(@"Rotation is %f",saucer.zRotation);
     SKAction *straighten = [SKAction rotateToAngle:0 duration:.75];
-    if (saucer.physicsBody.velocity.dy<0) {
-        [saucer.physicsBody applyForce:CGVectorMake(0, -200)];
-        NSLog(@"Compensating for movement %f",saucer.physicsBody.velocity.dy);
-    }
     
     if (saucer.position.y<self.size.height*.55) {
         //NSLog(@"Saucer dropped too low!");
@@ -314,13 +328,29 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     }];
 }
 
+- (void) doGameOver
+{
+    GameOver *gameOver = [[GameOver alloc]initWithSize:self.size];
+    [self.view presentScene:gameOver transition:[SKTransition fadeWithColor:[SKColor blackColor] duration:2]];
+    [damageIndicator removeFromSuperview];
+}
+
 - (void)adjustScore
 {
     //subtract for rock hit
     
-    self.score = self.score - 200 + [self calcBonus];
-    if (self.score <0) {
+    _score = _score - 200 + [self calcBonus];
+    if (_score < 0) {
         scoreLabel.fontColor = [SKColor redColor];
+    }
+    //update indicator
+    _damage = _damage + _score;
+    NSLog(@"Damage progress is: %f",_damage/1000);
+    damageIndicator.progress = _damage/1000;
+    if (_damage/1000 < 0) {
+        
+        [self doGameOver];
+    
     }
     _bonus = 0;
 }
@@ -353,6 +383,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         hitDamage.text = @"-200";
         [self addChild:hitDamage];
         [hitDamage runAction:scaleDissolve completion:^(void){[hitDamage removeFromParent];}];
+        
+        [saucer.physicsBody applyForce:CGVectorMake(0, -contact.bodyB.velocity.dy)];
+        //NSLog(@"Compensating for movement %f",contact.bodyB.velocity.dy);
+        
         
         [contact.bodyB.node.children[0] removeFromParent];
         [contact.bodyB.node removeFromParent];
