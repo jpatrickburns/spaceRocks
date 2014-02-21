@@ -268,10 +268,13 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     /* Called before each frame is rendered */
     if (!self.isPaused) {
         _bonus++;
-        //_score++;
+        _damage++;
+        damageIndicator.progress = _damage/1000;
         
         bonusLabel.text = [NSString stringWithFormat:@"Bonus: %04U",[self calcBonus]];
         scoreLabel.text = [NSString stringWithFormat:@"Score: %04D",_score];
+        
+        
         if (self.score > 0) {
             scoreLabel.fontColor=[SKColor whiteColor];
         }
@@ -344,10 +347,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         scoreLabel.fontColor = [SKColor redColor];
     }
     //update indicator
-    _damage = _damage + _score;
-    NSLog(@"Damage progress is: %f",_damage/1000);
-    damageIndicator.progress = _damage/1000;
-    if (_damage/1000 < 0) {
+    _damage = _damage -200;
+    NSLog(@"Damage is: %f",_damage);
+    //damageIndicator.progress = _damage/1000;
+    if (_damage < 0) {
         
         [self doGameOver];
     
