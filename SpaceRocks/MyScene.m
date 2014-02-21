@@ -269,11 +269,13 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     if (!self.isPaused) {
         _bonus++;
         _damage++;
+        if (_damage > 1000) {
+            _damage = 1000;
+        }
         damageIndicator.progress = _damage/1000;
         
         bonusLabel.text = [NSString stringWithFormat:@"Bonus: %04U",[self calcBonus]];
         scoreLabel.text = [NSString stringWithFormat:@"Score: %04D",_score];
-        
         
         if (self.score > 0) {
             scoreLabel.fontColor=[SKColor whiteColor];
@@ -285,7 +287,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     }
     
     
-    
     //NSLog(@"Rotation is %f",saucer.zRotation);
     SKAction *straighten = [SKAction rotateToAngle:0 duration:.75];
     
@@ -294,8 +295,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         [saucer.physicsBody applyForce:CGVectorMake(0, 200)];
     }
     
-    float max = 22.0;
-    if (saucer.zRotation>(0.0174532925 * max)||saucer.zRotation<-max * 0.0174532925) {
+    float maxTilt = 22.0;
+    if (saucer.zRotation>(0.0174532925 * maxTilt)||saucer.zRotation<-maxTilt * 0.0174532925) {
         [saucer runAction:straighten];
     }
 }
@@ -338,22 +339,21 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     [damageIndicator removeFromSuperview];
 }
 
-- (void)adjustScore
+- (void)adjustScoreWithDamage:(float)hitDamage
 {
     //subtract for rock hit
     
-    _score = _score - 200 + [self calcBonus];
+    _score = _score - hitDamage + [self calcBonus];
     if (_score < 0) {
         scoreLabel.fontColor = [SKColor redColor];
     }
     //update indicator
-    _damage = _damage -200;
-    NSLog(@"Damage is: %f",_damage);
+    _damage = _damage -hitDamage;
+    //NSLog(@"Damage is: %f",_damage);
     //damageIndicator.progress = _damage/1000;
     if (_damage < 0) {
         
         [self doGameOver];
-    
     }
     _bonus = 0;
 }
@@ -383,7 +383,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         SKAction *scaleDissolve = [SKAction group:@[
                                                     [SKAction scaleBy:2 duration:.75],
                                                     [SKAction fadeAlphaTo:0 duration:.75]]];
-        hitDamage.text = @"-200";
+        //set damage from strike.
+        float damageAmt = contact.bodyB.node.physicsBody.mass*10000;
+        hitDamage.text = [NSString stringWithFormat:@"-%u",abs(damageAmt)];
         [self addChild:hitDamage];
         [hitDamage runAction:scaleDissolve completion:^(void){[hitDamage removeFromParent];}];
         
@@ -393,7 +395,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         
         [contact.bodyB.node.children[0] removeFromParent];
         [contact.bodyB.node removeFromParent];
-        [self adjustScore];
+        [self adjustScoreWithDamage:damageAmt];
         
     }
 }
