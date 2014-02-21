@@ -8,6 +8,11 @@
 
 #import <SpriteKit/SpriteKit.h>
 
+
+
 @interface GameOver : SKScene
+
+@property float timeElapsed;
+
 
 @end

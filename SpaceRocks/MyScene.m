@@ -12,8 +12,6 @@
 
 @interface MyScene()
 
-@property int score;
-@property int bonus;
 @property float damage;
 @end
 
@@ -24,10 +22,10 @@ SKSpriteNode *saucer;
 SKSpriteNode *autoPilotButton;
 SKSpriteNode *pauseButton;
 //readouts
-SKLabelNode *scoreLabel;
-SKLabelNode *bonusLabel;
+SKLabelNode *timeLabel;
 UIProgressView *damageIndicator;
-
+NSDate *pausedTime;
+NSDate *started;
 bool autoPilotIsOn;
 
 //masks for collisions
@@ -50,7 +48,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 {
     
     SKSpriteNode *rock = [SKSpriteNode spriteNodeWithImageNamed:@"rock"];
-    CGFloat tempSize = skRand(5, self.size.width/20);
+    CGFloat tempSize = skRand(5, saucer.size.width/3);
     rock.size = CGSizeMake(tempSize, tempSize);
     rock.position = CGPointMake(skRand(0, self.size.width), self.size.height);
     rock.name = @"rock";
@@ -134,7 +132,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         }
         
         NSLog(@"Textures contain %@",saucerTextures);
-        float saucerSize = self.size.width *.2;
+        float saucerSize = self.size.width *.15;
         SKAction *flyin = [SKAction repeatActionForever:[SKAction animateWithTextures:saucerTextures timePerFrame:.1]];
         saucer = [[SKSpriteNode alloc] initWithTexture:[flyingSaucer textureNamed:@"saucer001.png"]
                                                  color:nil
@@ -168,19 +166,23 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 
 - (void) pauseScene
 {
+    
     self.paused = !self.paused;
     if (self.paused) {
+        pausedTime = [NSDate date];
         pauseButton.texture = [SKTexture textureWithImageNamed:@"playButton"];
     }else{
+        //reset started
+        started = [NSDate dateWithTimeInterval:[pausedTime timeIntervalSinceNow] sinceDate:started];
         pauseButton.texture = [SKTexture textureWithImageNamed:@"pauseButton"];
     }
 }
 
 -(void)setupHud {
-    self.score = 0;
-    self.bonus = 0;
+    
     self.damage = 1000;
     autoPilotIsOn = NO;
+    started = [NSDate date];
     
     SKSpriteNode *readOutBG = [[SKSpriteNode alloc]initWithColor:[SKColor colorWithHue:0.573 saturation:0.510 brightness:0.882 alpha:0.5] size:CGSizeMake(self.size.width, self.size.height/20)];
     readOutBG.zPosition = 5;
@@ -200,23 +202,16 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     pauseButton.name = @"pauseButton";
     [readOutBG addChild:pauseButton];
     
-    scoreLabel = [SKLabelNode labelNodeWithFontNamed:@"Courier"];
+    timeLabel = [SKLabelNode labelNodeWithFontNamed:@"Courier"];
     //scoreLabel.name = kScoreHudName;
-    scoreLabel.fontSize = 15;
-    scoreLabel.fontColor = [SKColor whiteColor];
-    scoreLabel.text = [NSString stringWithFormat:@"Score:%04u", self.score];
-    scoreLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
-    scoreLabel.position = CGPointMake(autoPilotButton.size.width+pauseButton.size.width + 20, readOutBG.size.height/3);
-    scoreLabel.name = @"score";
-    [readOutBG addChild:scoreLabel];
+    timeLabel.fontSize = 15;
+    timeLabel.fontColor = [SKColor whiteColor];
+    timeLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
+    timeLabel.position = CGPointMake(autoPilotButton.size.width+pauseButton.size.width + 20, readOutBG.size.height/3);
+    timeLabel.name = @"time";
+    [readOutBG addChild:timeLabel];
     
-    bonusLabel = [scoreLabel copy];
-    //safeTimeLabel.text = [NSString stringWithFormat:@"%04f",_safeTime];
-    bonusLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
-    bonusLabel.position = CGPointMake(scoreLabel.position.x, readOutBG.size.height+5);
-    bonusLabel.alpha=.5;
-    [readOutBG addChild:bonusLabel];
-    }
+}
 
 
 - (void)didMoveToView:(SKView *)view
@@ -229,7 +224,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     damageIndicator.trackTintColor = [SKColor redColor];
     [self.view addSubview:damageIndicator];
     
-     }
+}
 
 // method to interpret motion data
 
@@ -247,7 +242,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     /* Called when a touch begins */
     //
     UITouch *touch = [touches anyObject];
-    CGPoint location = [touch locationInNode:self];
+    // CGPoint location = [touch locationInNode:self];
     NSArray *nodes = [self nodesAtPoint:[touch locationInNode:self]];
     for (SKNode *node in nodes) {
         if ([node.name isEqual:@"autoPilot"]) {
@@ -259,33 +254,22 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     }
 }
 
-- (int)calcBonus{
-    int bonus = _bonus/30 * 50;
-    return bonus;
-}
 
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
     if (!self.isPaused) {
-        _bonus++;
         _damage++;
         if (_damage > 1000) {
             _damage = 1000;
         }
+
+        timeLabel.text = [NSString stringWithFormat:@"Time:%f",[started timeIntervalSinceNow]*-1];
         damageIndicator.progress = _damage/1000;
-        
-        bonusLabel.text = [NSString stringWithFormat:@"Bonus: %04U",[self calcBonus]];
-        scoreLabel.text = [NSString stringWithFormat:@"Score: %04D",_score];
-        
-        if (self.score > 0) {
-            scoreLabel.fontColor=[SKColor whiteColor];
-        }
         if (!autoPilotIsOn) {
             //implement tilt motion
             [self processUserMotionForUpdate:currentTime];
         }
     }
-    
     
     //NSLog(@"Rotation is %f",saucer.zRotation);
     SKAction *straighten = [SKAction rotateToAngle:0 duration:.75];
@@ -334,28 +318,24 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 
 - (void) doGameOver
 {
-    GameOver *gameOver = [[GameOver alloc]initWithSize:self.size];
-    [self.view presentScene:gameOver transition:[SKTransition fadeWithColor:[SKColor blackColor] duration:2]];
+    GameOver *newScene = [[GameOver alloc]initWithSize:self.size];
+    newScene.timeElapsed = [started timeIntervalSinceNow];
+    NSLog(@"Sent %f to new scene.",newScene.timeElapsed);
+    [self.view presentScene:newScene transition:[SKTransition fadeWithColor:[SKColor whiteColor] duration:2]];
     [damageIndicator removeFromSuperview];
 }
 
+
 - (void)adjustScoreWithDamage:(float)hitDamage
 {
-    //subtract for rock hit
-    
-    _score = _score - hitDamage + [self calcBonus];
-    if (_score < 0) {
-        scoreLabel.fontColor = [SKColor redColor];
-    }
     //update indicator
-    _damage = _damage -hitDamage;
+    _damage = _damage -(hitDamage);
     //NSLog(@"Damage is: %f",_damage);
-    //damageIndicator.progress = _damage/1000;
     if (_damage < 0) {
-        
+        [self runAction:self.playMySound];
+
         [self doGameOver];
     }
-    _bonus = 0;
 }
 
 -(void)didBeginContact:(SKPhysicsContact *)contact
@@ -384,7 +364,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
                                                     [SKAction scaleBy:2 duration:.75],
                                                     [SKAction fadeAlphaTo:0 duration:.75]]];
         //set damage from strike.
-        float damageAmt = contact.bodyB.node.physicsBody.mass*10000;
+        float damageAmt = contact.bodyB.node.physicsBody.mass*10000+50;
+        
         hitDamage.text = [NSString stringWithFormat:@"-%u",abs(damageAmt)];
         [self addChild:hitDamage];
         [hitDamage runAction:scaleDissolve completion:^(void){[hitDamage removeFromParent];}];
