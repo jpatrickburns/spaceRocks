@@ -27,6 +27,9 @@ UIProgressView *damageIndicator;
 NSDate *pausedTime;
 NSDate *started;
 bool autoPilotIsOn;
+float saucerSize;
+float rockSize;
+
 
 //masks for collisions
 static const uint32_t rockCategory     =  0x1 << 0;
@@ -46,9 +49,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 
 - (void)addRock
 {
-    
     SKSpriteNode *rock = [SKSpriteNode spriteNodeWithImageNamed:@"rock"];
-    CGFloat tempSize = skRand(5, saucer.size.width/3);
+    CGFloat tempSize = skRand(5, rockSize);
     rock.size = CGSizeMake(tempSize, tempSize);
     rock.position = CGPointMake(skRand(0, self.size.width), self.size.height);
     rock.name = @"rock";
@@ -69,25 +71,64 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     [rock addChild:myTrail];
 }
 
+- (void) makeSaucerWithSize:(float)saucerSize
+{
+    //add saucer
+    SKTextureAtlas *flyingSaucer = [SKTextureAtlas atlasNamed:@"FlyingSaucer"];
+    NSArray *sortedList = [flyingSaucer.textureNames sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+    //load textures
+    NSMutableArray *saucerTextures = [[NSMutableArray alloc]init];
+    for (int i=0; i<sortedList.count; i++) {
+        SKTexture *newTex = [flyingSaucer textureNamed:sortedList[i]];
+        [saucerTextures addObject:newTex];
+        NSLog(@"Added %@",sortedList[i]);
+    }
+    
+    NSLog(@"Textures contain %@",saucerTextures);
+    SKAction *flyin = [SKAction repeatActionForever:[SKAction animateWithTextures:saucerTextures timePerFrame:.1]];
+    saucer = [[SKSpriteNode alloc] initWithTexture:[flyingSaucer textureNamed:@"saucer001.png"]
+                                             color:nil
+                                              size:CGSizeMake(saucerSize, saucerSize/2)];
+    saucer.position = CGPointMake(self.size.width/2, self.size.height*.55);
+    [saucer runAction:flyin];
+    
+    //physics stuff
+    saucer.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:saucer.size];
+    saucer.physicsBody.affectedByGravity = NO;
+    saucer.physicsBody.linearDamping = 1;
+    saucer.physicsBody.angularDamping = 8;
+    saucer.physicsBody.restitution = .5;
+    //saucer.physicsBody.usesPreciseCollisionDetection = YES;
+    saucer.physicsBody.mass = 1;
+    saucer.physicsBody.contactTestBitMask = 1;
+    saucer.physicsBody.node.name = @"saucer";
+    [self addChild:saucer];
+}
+
 -(id)initWithSize:(CGSize)size {
     
     if (self = [super initWithSize:size]) {
         
         /* Setup your scene here */
+        
         self.playMySound = [SKAction playSoundFileNamed:@"boom.mp3" waitForCompletion:NO];
         
         self.physicsWorld.gravity = CGVectorMake(0,-2);
         self.physicsWorld.contactDelegate = self;
         self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];
         
-        //start the rocks
-        SKAction *makeRocks = [SKAction sequence: @[
-                                                    [SKAction performSelector:@selector(addRock) onTarget:self],
-                                                    [SKAction waitForDuration:0.50 withRange:0.15]
-                                                    ]];
-        [self runAction: [SKAction repeatActionForever:makeRocks]];
+        //detirmine iPad or iPhone object sizes
         
-        //add bg
+        if (UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPhone) {
+            saucerSize = 48;
+            rockSize = 16;
+        }else{
+            //if an iPad
+            saucerSize = 96;
+            rockSize = 32;
+        }
+        
+                //add bg
         SKSpriteNode *myBG = [SKSpriteNode spriteNodeWithImageNamed:@"SpaceBG"];
         myBG.position=CGPointMake(self.size.width/2, self.size.height/2);
         [self addChild:myBG];
@@ -120,38 +161,15 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         //add stars emitter
         [self addChild:myStars];
         
-        //add saucer
-        SKTextureAtlas *flyingSaucer = [SKTextureAtlas atlasNamed:@"FlyingSaucer"];
-        NSArray *sortedList = [flyingSaucer.textureNames sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-        //load textures
-        NSMutableArray *saucerTextures = [[NSMutableArray alloc]init];
-        for (int i=0; i<sortedList.count; i++) {
-            SKTexture *newTex = [flyingSaucer textureNamed:sortedList[i]];
-            [saucerTextures addObject:newTex];
-            NSLog(@"Added %@",sortedList[i]);
-        }
+        //start the rocks
+        SKAction *makeRocks = [SKAction sequence: @[
+                                                    [SKAction performSelector:@selector(addRock) onTarget:self],
+                                                    [SKAction waitForDuration:0.50 withRange:0.15]
+                                                    ]];
+        [self runAction: [SKAction repeatActionForever:makeRocks]];
         
-        NSLog(@"Textures contain %@",saucerTextures);
-        float saucerSize = self.size.width *.15;
-        SKAction *flyin = [SKAction repeatActionForever:[SKAction animateWithTextures:saucerTextures timePerFrame:.1]];
-        saucer = [[SKSpriteNode alloc] initWithTexture:[flyingSaucer textureNamed:@"saucer001.png"]
-                                                 color:nil
-                                                  size:CGSizeMake(saucerSize, saucerSize/2)];
-        
-        saucer.position = CGPointMake(self.size.width/2, self.size.height*.55);
-        [saucer runAction:flyin];
-        
-        //physics stuff
-        saucer.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:saucer.size];
-        saucer.physicsBody.affectedByGravity = NO;
-        saucer.physicsBody.linearDamping = 1;
-        saucer.physicsBody.angularDamping = 8;
-        saucer.physicsBody.restitution = .5;
-        //saucer.physicsBody.usesPreciseCollisionDetection = YES;
-        saucer.physicsBody.mass = 1;
-        saucer.physicsBody.contactTestBitMask = 1;
-        saucer.physicsBody.node.name = @"saucer";
-        [self addChild:saucer];
+
+        [self makeSaucerWithSize:saucerSize];
         
         //init Accelerometer
         self.myMotionManager = [[CMMotionManager alloc]init];
@@ -166,7 +184,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 
 - (void) pauseScene
 {
-    
     self.paused = !self.paused;
     if (self.paused) {
         pausedTime = [NSDate date];
@@ -191,23 +208,25 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     [self addChild:readOutBG];
     
     autoPilotButton = [[SKSpriteNode alloc]initWithImageNamed:@"apOff"];
-    //autoPilotButton.anchorPoint = CGPointZero;
+    CGSize apSize = CGSizeMake((readOutBG.size.height*.66) *2,readOutBG.size.height*.66);
+    autoPilotButton.size = apSize;
     autoPilotButton.position = CGPointMake(autoPilotButton.size.width/2 +5, readOutBG.size.height/2);
     autoPilotButton.name = @"autoPilot";
     [readOutBG addChild:autoPilotButton];
     
     pauseButton = [[SKSpriteNode alloc]initWithImageNamed:@"pauseButton"];
-    //pauseButton.anchorPoint = CGPointZero;
+    CGSize pauseSize = CGSizeMake(readOutBG.size.height*.66, readOutBG.size.height*.66);
+    pauseButton.size = pauseSize;
     pauseButton.position = CGPointMake(autoPilotButton.size.width + pauseButton.size.width, readOutBG.size.height/2);
     pauseButton.name = @"pauseButton";
     [readOutBG addChild:pauseButton];
     
     timeLabel = [SKLabelNode labelNodeWithFontNamed:@"Courier"];
     //scoreLabel.name = kScoreHudName;
-    timeLabel.fontSize = 15;
+    timeLabel.fontSize = readOutBG.size.height/2;
     timeLabel.fontColor = [SKColor whiteColor];
     timeLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
-    timeLabel.position = CGPointMake(autoPilotButton.size.width+pauseButton.size.width + 20, readOutBG.size.height/3);
+    timeLabel.position = CGPointMake(autoPilotButton.size.width+pauseButton.size.width + 40, readOutBG.size.height/3);
     timeLabel.name = @"time";
     [readOutBG addChild:timeLabel];
     
@@ -262,7 +281,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         if (_damage > 1000) {
             _damage = 1000;
         }
-
+        
         timeLabel.text = [NSString stringWithFormat:@"Time:%f",[started timeIntervalSinceNow]*-1];
         damageIndicator.progress = _damage/1000;
         if (!autoPilotIsOn) {
@@ -332,10 +351,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     _damage = _damage -(hitDamage);
     //NSLog(@"Damage is: %f",_damage);
     if (_damage < 0) {
-        [self runAction:self.playMySound];
-
-        [self doGameOver];
-    }
+        [self runAction:[self playMySound] completion:^{
+            [self doGameOver];
+        }];
+            }
 }
 
 -(void)didBeginContact:(SKPhysicsContact *)contact
@@ -364,7 +383,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
                                                     [SKAction scaleBy:2 duration:.75],
                                                     [SKAction fadeAlphaTo:0 duration:.75]]];
         //set damage from strike.
-        float damageAmt = contact.bodyB.node.physicsBody.mass*10000+50;
+        float damageAmt = contact.bodyB.node.physicsBody.mass*10000;
         
         hitDamage.text = [NSString stringWithFormat:@"-%u",abs(damageAmt)];
         [self addChild:hitDamage];
@@ -373,11 +392,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         [saucer.physicsBody applyForce:CGVectorMake(0, -contact.bodyB.velocity.dy)];
         //NSLog(@"Compensating for movement %f",contact.bodyB.velocity.dy);
         
-        
-        [contact.bodyB.node.children[0] removeFromParent];
+        //[contact.bodyB.node.children[0] removeFromParent];
         [contact.bodyB.node removeFromParent];
         [self adjustScoreWithDamage:damageAmt];
-        
     }
 }
 

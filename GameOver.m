@@ -45,7 +45,7 @@ SKLabelNode *timeNote;
     /* Called when a touch begins */
     //
     UITouch *touch = [touches anyObject];
-    CGPoint location = [touch locationInNode:self];
+    //CGPoint location = [touch locationInNode:self];
     NSArray *nodes = [self nodesAtPoint:[touch locationInNode:self]];
     for (SKNode *node in nodes) {
         if ([node.name isEqual:@"newGame"]) {
