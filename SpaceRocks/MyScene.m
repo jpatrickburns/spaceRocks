@@ -21,14 +21,18 @@
 SKSpriteNode *saucer;
 SKSpriteNode *autoPilotButton;
 SKSpriteNode *pauseButton;
+
 //readouts
 SKLabelNode *timeLabel;
+SKLabelNode *energyLeft;
 UIProgressView *damageIndicator;
+
 NSDate *pausedTime;
 NSDate *started;
 bool autoPilotIsOn;
 float saucerSize;
 float rockSize;
+float readoutSize;
 
 
 //masks for collisions
@@ -44,7 +48,6 @@ static inline CGFloat skRandf() {
 static inline CGFloat skRand(CGFloat low, CGFloat high) {
     return skRandf() * (high - low) + low;
 }
-
 
 
 - (void)addRock
@@ -164,7 +167,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         //start the rocks
         SKAction *makeRocks = [SKAction sequence: @[
                                                     [SKAction performSelector:@selector(addRock) onTarget:self],
-                                                    [SKAction waitForDuration:0.50 withRange:0.15]
+                                                    [SKAction waitForDuration:0.40 withRange:0.15]
                                                     ]];
         [self runAction: [SKAction repeatActionForever:makeRocks]];
         
@@ -200,8 +203,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     self.damage = 1000;
     autoPilotIsOn = NO;
     started = [NSDate date];
-    
-    SKSpriteNode *readOutBG = [[SKSpriteNode alloc]initWithColor:[SKColor colorWithHue:0.573 saturation:0.510 brightness:0.882 alpha:0.5] size:CGSizeMake(self.size.width, self.size.height/20)];
+    SKColor *hudBase = [SKColor colorWithHue:0.573 saturation:0.510 brightness:0.882 alpha:.5];
+    SKColor *timeColor = [SKColor colorWithHue:0.573 saturation:0.510 brightness:0.882 alpha:1];
+    SKSpriteNode *readOutBG = [[SKSpriteNode alloc]initWithColor:hudBase
+                                                            size:CGSizeMake(self.size.width, self.size.height/15)];
     readOutBG.zPosition = 5;
     readOutBG.anchorPoint = CGPointMake(0, 0);
     readOutBG.position = CGPointMake(0, 0);
@@ -220,16 +225,20 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     pauseButton.position = CGPointMake(autoPilotButton.size.width + pauseButton.size.width, readOutBG.size.height/2);
     pauseButton.name = @"pauseButton";
     [readOutBG addChild:pauseButton];
+  
+    energyLeft = [SKLabelNode labelNodeWithFontNamed:@"Courier"];
+    energyLeft.fontColor = [SKColor whiteColor];
+    energyLeft.fontSize = readOutBG.size.height/2;
+    energyLeft.position = CGPointMake(self.size.width/2, self.size.height - (energyLeft.fontSize*3));
+    [self addChild:energyLeft];
     
     timeLabel = [SKLabelNode labelNodeWithFontNamed:@"Courier"];
-    //scoreLabel.name = kScoreHudName;
-    timeLabel.fontSize = readOutBG.size.height/2;
-    timeLabel.fontColor = [SKColor whiteColor];
-    timeLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
-    timeLabel.position = CGPointMake(autoPilotButton.size.width+pauseButton.size.width + 40, readOutBG.size.height/3);
+    timeLabel.fontSize = readOutBG.size.height/3;
+    timeLabel.fontColor = timeColor;
+    timeLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeCenter;
+    timeLabel.position = CGPointMake(self.size.width/2, self.size.height - (energyLeft.fontSize *4));
     timeLabel.name = @"time";
-    [readOutBG addChild:timeLabel];
-    
+    [self addChild:timeLabel];
 }
 
 
@@ -282,8 +291,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
             _damage = 1000;
         }
         
-        timeLabel.text = [NSString stringWithFormat:@"Time:%f",[started timeIntervalSinceNow]*-1];
+        timeLabel.text = [NSString stringWithFormat:@"Time:%.2f",[started timeIntervalSinceNow]*-1];
         damageIndicator.progress = _damage/1000;
+        energyLeft.text = [NSString stringWithFormat:@"Energy:%D%%",abs(_damage/10)];
+        
         if (!autoPilotIsOn) {
             //implement tilt motion
             [self processUserMotionForUpdate:currentTime];
