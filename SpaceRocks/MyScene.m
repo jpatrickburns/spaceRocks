@@ -370,14 +370,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     boom.position = boomPosition;
     boom.particleSize = CGSizeMake(myBoomSize, myBoomSize);
     [self addChild:boom];
-    if (gameOver) {
-        [self runAction:self.playMySound completion:^{
-            [self doGameOver];
-        }];
-    }else{
-        [self runAction:self.playMySound];
-
-    }
+    [self runAction:self.playMySound];
 }
 
 - (void)adjustScoreWithDamage:(float)hitDamage atPosition:(CGPoint)pos
@@ -386,8 +379,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     _damage = _damage -(hitDamage);
     //NSLog(@"Damage is: %f",_damage);
     if (_damage < 0) {
-        gameOver = YES;
-        [self makeExplosionWithSize:500 inPosition:pos];
+        [self makeExplosionWithSize:800 inPosition:saucer.position];
+        [self performSelector:@selector(doGameOver) withObject:self afterDelay:.5];
     }
 }
 
