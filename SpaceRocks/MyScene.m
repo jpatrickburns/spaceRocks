@@ -30,6 +30,7 @@ UIProgressView *damageIndicator;
 NSDate *pausedTime;
 NSDate *started;
 bool autoPilotIsOn;
+bool gameOver;
 float saucerSize;
 float rockSize;
 float readoutSize;
@@ -114,6 +115,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         
         /* Setup your scene here */
         
+        gameOver = NO;
         self.playMySound = [SKAction playSoundFileNamed:@"boom.mp3" waitForCompletion:NO];
         
         self.physicsWorld.gravity = CGVectorMake(0,-2);
@@ -368,8 +370,15 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     boom.position = boomPosition;
     boom.particleSize = CGSizeMake(myBoomSize, myBoomSize);
     [self addChild:boom];
-    [self runAction:self.playMySound];
+    if (gameOver) {
+        [self runAction:self.playMySound completion:^{
+            [self doGameOver];
+        }];
+    }else{
+        [self runAction:self.playMySound];
+
     }
+}
 
 - (void)adjustScoreWithDamage:(float)hitDamage atPosition:(CGPoint)pos
 {
@@ -377,11 +386,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     _damage = _damage -(hitDamage);
     //NSLog(@"Damage is: %f",_damage);
     if (_damage < 0) {
-        
-        [self runAction:self.playMySound completion:^{
-            [self doGameOver];
-        }];
-               }
+        gameOver = YES;
+        [self makeExplosionWithSize:500 inPosition:pos];
+    }
 }
 
 -(void)didBeginContact:(SKPhysicsContact *)contact
