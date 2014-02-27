@@ -33,7 +33,7 @@ bool autoPilotIsOn;
 float saucerSize;
 float rockSize;
 float readoutSize;
-
+float boomSize;
 
 //masks for collisions
 static const uint32_t rockCategory     =  0x1 << 0;
@@ -124,14 +124,18 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         
         if (UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPhone) {
             saucerSize = 48;
-            rockSize = 16;
+            rockSize = 20;
+            readoutSize = 30;
+            boomSize = 60;
         }else{
             //if an iPad
             saucerSize = 96;
             rockSize = 32;
+            readoutSize = 50;
+            boomSize = 128;
         }
         
-                //add bg
+        //add bg
         SKSpriteNode *myBG = [SKSpriteNode spriteNodeWithImageNamed:@"SpaceBG"];
         myBG.position=CGPointMake(self.size.width/2, self.size.height/2);
         [self addChild:myBG];
@@ -171,7 +175,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
                                                     ]];
         [self runAction: [SKAction repeatActionForever:makeRocks]];
         
-
+        
         [self makeSaucerWithSize:saucerSize];
         
         //init Accelerometer
@@ -206,7 +210,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     SKColor *hudBase = [SKColor colorWithHue:0.573 saturation:0.510 brightness:0.882 alpha:.5];
     SKColor *timeColor = [SKColor colorWithHue:0.573 saturation:0.510 brightness:0.882 alpha:1];
     SKSpriteNode *readOutBG = [[SKSpriteNode alloc]initWithColor:hudBase
-                                                            size:CGSizeMake(self.size.width, self.size.height/15)];
+                                                            size:CGSizeMake(self.size.width, readoutSize)];
     readOutBG.zPosition = 5;
     readOutBG.anchorPoint = CGPointMake(0, 0);
     readOutBG.position = CGPointMake(0, 0);
@@ -225,7 +229,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
     pauseButton.position = CGPointMake(autoPilotButton.size.width + pauseButton.size.width, readOutBG.size.height/2);
     pauseButton.name = @"pauseButton";
     [readOutBG addChild:pauseButton];
-  
+    
     energyLeft = [SKLabelNode labelNodeWithFontNamed:@"Courier"];
     energyLeft.fontColor = [SKColor whiteColor];
     energyLeft.fontSize = readOutBG.size.height/2;
@@ -286,7 +290,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
     if (!self.isPaused) {
-        _damage++;
+        _damage=_damage +.5;
         if (_damage > 1000) {
             _damage = 1000;
         }
@@ -348,46 +352,47 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
 
 - (void) doGameOver
 {
+    damageIndicator.progress = 0;
+    energyLeft.text = @"Energy:0%";
     GameOver *newScene = [[GameOver alloc]initWithSize:self.size];
     newScene.timeElapsed = [started timeIntervalSinceNow];
-    NSLog(@"Sent %f to new scene.",newScene.timeElapsed);
-    [self.view presentScene:newScene transition:[SKTransition fadeWithColor:[SKColor whiteColor] duration:2]];
+    //NSLog(@"Sent %f to new scene.",newScene.timeElapsed);
+    [self.view presentScene:newScene transition:[SKTransition fadeWithColor:[SKColor whiteColor] duration:1]];
     [damageIndicator removeFromSuperview];
 }
 
+- (void) makeExplosionWithSize:(float)myBoomSize inPosition:(CGPoint)boomPosition
+{
+    NSString *myFile = [[NSBundle mainBundle] pathForResource:@"explosion" ofType:@"sks"];
+    SKEmitterNode *boom = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
+    boom.position = boomPosition;
+    boom.particleSize = CGSizeMake(myBoomSize, myBoomSize);
+    [self addChild:boom];
+    [self runAction:self.playMySound];
+    }
 
-- (void)adjustScoreWithDamage:(float)hitDamage
+- (void)adjustScoreWithDamage:(float)hitDamage atPosition:(CGPoint)pos
 {
     //update indicator
     _damage = _damage -(hitDamage);
     //NSLog(@"Damage is: %f",_damage);
     if (_damage < 0) {
-        [self runAction:[self playMySound] completion:^{
+        
+        [self runAction:self.playMySound completion:^{
             [self doGameOver];
         }];
-            }
+               }
 }
 
 -(void)didBeginContact:(SKPhysicsContact *)contact
 {
-    float factor;
-    if (self.size.width==360) {
-        factor=.5;
-    }else{
-        factor=1;
-    }
+    //NSLog(@"%@ hit %@",contact.bodyA.node.name, contact.bodyB.node.name);
     
     if ([contact.bodyB.node.name isEqual:@"rock"]) {
-        NSString *myFile = [[NSBundle mainBundle] pathForResource:@"explosion" ofType:@"sks"];
-        SKEmitterNode *boom = [NSKeyedUnarchiver unarchiveObjectWithFile:myFile];
-        //NSLog(@"%@ hit %@",contact.bodyA.node.name, contact.bodyB.node.name);
-        boom.position = contact.contactPoint;
-        boom.particleScale = factor/2;
-        boom.particleSize = CGSizeMake(64*factor, 64*factor);
-        [self addChild:boom];
-        [self runAction:self.playMySound];
+        [self makeExplosionWithSize:boomSize inPosition:contact.bodyB.node.position];
+        
         SKLabelNode *hitDamage = [[SKLabelNode alloc]initWithFontNamed:@"Courier"];
-        hitDamage.position = boom.position;
+        hitDamage.position = contact.bodyB.node.position;
         hitDamage.fontSize = 10;
         hitDamage.fontColor = [SKColor redColor];
         SKAction *scaleDissolve = [SKAction group:@[
@@ -405,7 +410,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high) {
         
         //[contact.bodyB.node.children[0] removeFromParent];
         [contact.bodyB.node removeFromParent];
-        [self adjustScoreWithDamage:damageAmt];
+        [self adjustScoreWithDamage:damageAmt atPosition:hitDamage.position];
     }
 }
 
