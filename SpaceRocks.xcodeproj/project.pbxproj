@@ -11,9 +11,10 @@
 		69208F0C18AFECD9005F2AD2 /* firey.png in Resources */ = {isa = PBXBuildFile; fileRef = 69208F0B18AFECD9005F2AD2 /* firey.png */; };
 		69208F0E18B001BE005F2AD2 /* byooo.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 69208F0D18B001BE005F2AD2 /* byooo.mp3 */; };
 		693FF22518AEA8400065B9D5 /* Storyboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 693FF22418AEA8400065B9D5 /* Storyboard_iPhone.storyboard */; };
-		6943B65718B790EB00E3EF31 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6943B65618B790EB00E3EF31 /* Images.xcassets */; };
 		6943B66118B7D4E500E3EF31 /* GameOver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6943B66018B7D4E500E3EF31 /* GameOver.m */; };
 		694A1A0418AE6C6900258956 /* boing.caf in Resources */ = {isa = PBXBuildFile; fileRef = 694A1A0318AE69F600258956 /* boing.caf */; };
+		69514DDB18CA68BD00E6D9EB /* StartupScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 69514DDA18CA68BD00E6D9EB /* StartupScene.m */; };
+		69514DDD18CA6DC300E6D9EB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 69514DDC18CA6DC300E6D9EB /* Images.xcassets */; };
 		698CA71E18BD19E30000274E /* FlyingSaucer.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 698CA71D18BD19E30000274E /* FlyingSaucer.atlas */; };
 		69ADEF2618AD142B003881B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69ADEF2518AD142B003881B1 /* Foundation.framework */; };
 		69ADEF2818AD142B003881B1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69ADEF2718AD142B003881B1 /* CoreGraphics.framework */; };
@@ -52,10 +53,12 @@
 		69208F0B18AFECD9005F2AD2 /* firey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firey.png; sourceTree = "<group>"; };
 		69208F0D18B001BE005F2AD2 /* byooo.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = byooo.mp3; sourceTree = "<group>"; };
 		693FF22418AEA8400065B9D5 /* Storyboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard_iPhone.storyboard; sourceTree = "<group>"; };
-		6943B65618B790EB00E3EF31 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		6943B65F18B7D4E500E3EF31 /* GameOver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameOver.h; path = ../GameOver.h; sourceTree = "<group>"; };
 		6943B66018B7D4E500E3EF31 /* GameOver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GameOver.m; path = ../GameOver.m; sourceTree = "<group>"; };
 		694A1A0318AE69F600258956 /* boing.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = boing.caf; sourceTree = "<group>"; };
+		69514DD918CA68BD00E6D9EB /* StartupScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StartupScene.h; path = ../StartupScene.h; sourceTree = "<group>"; };
+		69514DDA18CA68BD00E6D9EB /* StartupScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StartupScene.m; path = ../StartupScene.m; sourceTree = "<group>"; };
+		69514DDC18CA6DC300E6D9EB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		698CA71D18BD19E30000274E /* FlyingSaucer.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = FlyingSaucer.atlas; sourceTree = "<group>"; };
 		69ADEF2218AD142B003881B1 /* SpaceRocks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpaceRocks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		69ADEF2518AD142B003881B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -144,7 +147,7 @@
 		69ADEF2D18AD142B003881B1 /* SpaceRocks */ = {
 			isa = PBXGroup;
 			children = (
-				6943B65618B790EB00E3EF31 /* Images.xcassets */,
+				69514DDC18CA6DC300E6D9EB /* Images.xcassets */,
 				698CA71D18BD19E30000274E /* FlyingSaucer.atlas */,
 				69ADEF3918AD142B003881B1 /* Main.storyboard */,
 				693FF22418AEA8400065B9D5 /* Storyboard_iPhone.storyboard */,
@@ -152,6 +155,8 @@
 				69ADEF3718AD142B003881B1 /* AppDelegate.m */,
 				69ADEF3C18AD142B003881B1 /* ViewController.h */,
 				69ADEF3D18AD142B003881B1 /* ViewController.m */,
+				69514DD918CA68BD00E6D9EB /* StartupScene.h */,
+				69514DDA18CA68BD00E6D9EB /* StartupScene.m */,
 				69ADEF3F18AD142B003881B1 /* MyScene.h */,
 				69ADEF4018AD142B003881B1 /* MyScene.m */,
 				6943B65F18B7D4E500E3EF31 /* GameOver.h */,
@@ -283,8 +288,8 @@
 				69208F0C18AFECD9005F2AD2 /* firey.png in Resources */,
 				6904339318B3BCB800668487 /* rockTrail.sks in Resources */,
 				69ADEF6D18AD2A8C003881B1 /* rock128.png in Resources */,
-				6943B65718B790EB00E3EF31 /* Images.xcassets in Resources */,
 				69ADEF6F18AD7728003881B1 /* explosion.sks in Resources */,
+				69514DDD18CA6DC300E6D9EB /* Images.xcassets in Resources */,
 				69ADEF6818AD1C0A003881B1 /* fallingStars.sks in Resources */,
 				693FF22518AEA8400065B9D5 /* Storyboard_iPhone.storyboard in Resources */,
 				69ADEF3B18AD142B003881B1 /* Main.storyboard in Resources */,
@@ -307,6 +312,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				69514DDB18CA68BD00E6D9EB /* StartupScene.m in Sources */,
 				69ADEF4118AD142B003881B1 /* MyScene.m in Sources */,
 				6943B66118B7D4E500E3EF31 /* GameOver.m in Sources */,
 				69ADEF3E18AD142B003881B1 /* ViewController.m in Sources */,
